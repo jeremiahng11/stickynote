@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/all.min.css">
+	<link rel="stylesheet" href="/css/reset.min.css">
+	<link rel="stylesheet" href="/css/jquery-ui.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="shortcut icon" type="image/ico" href="/images/favicon.png" />
+    <title>Sticky Notes</title>
+  </head>
+  <body>
+	<!-- Preloader Box -->
+	<div class="preloader">
+		<div class="status">
+			<img src="/images/preloader.gif" alt="loader">
+		</div>
+	</div>
+
+	<header class="header_wrapper">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+					<div class="logo_wrap">
+						<a href="javascript:void(0);"><img alt="logo" src="/images/Sticky-Notes-logo.png"></a>
+					</div>
+				</div>
+				<div class="col-xl-8 col-lg-8 col-md-8 col-sm-8 col-8">
+					<div class="main_menu">
+						<ul>
+							<li>
+								<a title="no hidden notes" class="see_notes" href="javascript:;" notes_see="" style="pointer-events: none; opacity: 0.4;display: none;"><i class="fas fa-eye" disabled></i></a>
+							</li>
+							<li>
+								<a title="Logout" class="logout_btn" href="/logout"><i class="fas fa-power-off"></i></a>
+							</li>
+							<li>
+								<a title="Notes List" class="toggle_btn" href="javascript:;"><i class="fas fa-list-ul"></i></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<!-- Main Wrapper -->
+	<div class="main_wrapper">
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<div class="sidebar_drawer">
+				<h4 class="sub_title">
+					<span>Board</span>
+					<a class="add_new_note" href="javascript:void(0);"><i class="fas fa-plus"></i> Add New</a>
+				</h4>
+				<div class="sidebar_drawer_box_title"></div>
+				<div class="note_boards">
+					<% if(board.length > 0){ %>
+						<% for(let i in board){ %>
+							<div class="sidebar_drawer_box" title_id="<%= board[i].id %>">
+								<span class="note_date"><%= board[i].createdAt %></span>
+								<span><p class="title"><%= board[i].title %></p></span>
+								<span class="note_count"><b><%= board[i].sn_notes.length %></b> Notes</span>
+								<a class="sidebar_drawer_box_delete" href="javascript:void(0);"><i class="far fa-trash-alt"></i></a>
+							</div>
+						<% } %>
+					<% }else{ %>
+						<p class="no_board">No board created yet!</p>
+					<% } %>
+				</div>
+				
+			</div>
+		</div>
+		<!-- Main Notes Container -->
+		<div class="content">
+			<div class="notes_controller">
+				<ul>
+					<li>
+						<a class="add_note_box" href="javascript:void(0);" project_id="" style="display:none;">Add New</a>
+					</li>
+					<li>
+						<a class="save_btn" href="javascript:void(0);" style="display:none;">Save</a>
+					</li>
+				</ul>
+			</div>
+			<div class="content_inner">
+				<div class="container-fluid">
+					<div class="row">
+
+					</div>	
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Toaster alert -->
+	<div class="alert_close note_alert_wrapper msg">
+		<div class="note_alert_inner">
+			<div class="note_alert_icon"></div>
+			<p class="alert_text"></p>
+		</div>
+	</div>
+
+	<!-- Pop Up Start  -->
+	<div class="popup_container deleteBtnWrapper">
+		<div class="popup_containerinner">
+			<div class="popup_wrapper">
+				<a href="javascript:void(0);" class="close_btn">X</a>
+				<div class="popup_info">
+					<h4>Do you Really Want to Delete ?</h4>
+					<button class="popup_btn skyBlue">No</button>
+					<button class="popup_btn red">Yes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Script Start -->
+	
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/jquery-ui.min.js"></script>
+	<script src="/js/drag.js"></script>
+	<script src="/js/custom.js"></script>
+	</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/all.min.css">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="shortcut icon" type="image/ico" href="/images/favicon.png" />
+    <title>Sticky Notes</title>
+  </head>
+  <body>
+	<!-- Welcom Wraapper -->
+	<div class="welcome_wrapper">
+		<div class="welcome_holder">
+			<div class="log_reg_form_wrapper">
+				<div class="welcome_logo_wrap">
+					<img class="logo" src="/images/Sticky-Notes-logo.png" alt="" />
+					<h4 class="welcome_title">Welcome Create easy notes</h4>	
+				</div>
+				<ul class="nav nav-tabs" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" id="login_tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="true">Login</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" id="register_tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">Register</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane fade active show" id="login" role="tabpanel" aria-labelledby="login_tab">
+						<div class="login_wrap">
+							<form class="" id="loginform">
+								<div class="input_wrap login" id="emailDiv">
+									<input type="email" placeholder="E-mail" id="email" name="email"/>
+									<i class="far fa-user"></i>
+									<div class="input_error">
+										<span id="emailError"></span>
+									</div>
+								</div>
+								<div class="input_wrap login" id="passwordDiv">
+									<input type="password" placeholder="Password" id="password" name="password"/>
+									<i class="fas fa-unlock-alt"></i>
+									<div class="input_error">
+										<span id="passwordError"></span>
+									</div>
+								</div>
+
+								<div class="note_forgot_pws_link">
+									<a href="/forgot-password">Forgot Password ?</a>
+								</div>
+
+								<button type="button" class="button" id="button" onclick="login()">Login</button>
+							</form>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register_tab">
+						<form class="" id="regForm">
+							<div class="input_wrap reg" id="email1Div">
+								<input type="email" placeholder="E-mail" id="email1" name="email1"/>
+								<i class="far fa-user"></i>
+								<div class="input_error">
+									<span id="mailError"></span>
+								</div>
+							</div>
+							<div class="input_wrap reg" id="password1Div">
+								<input type="password" placeholder="Password" id="password1" name="password1"/>
+								<i class="fas fa-unlock-alt"></i>
+								<div class="input_error">
+									<span id="passError"></span>
+								</div>
+							</div>
+							<div class="input_wrap reg" id="cpassDiv">
+								<input type="password" placeholder="Confirm Password" id="cpass" name="cpass"/>
+								<i class="fas fa-unlock-alt"></i>
+								<div class="input_error">
+									<span id="cpassError"></span>
+								</div>
+							</div>
+							<button type="button" class="button" id="button1" onclick="register()">Sign Up</button>
+						</form>
+					</div>				  
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Toaster alert -->
+	<div class="alert_close note_alert_wrapper msg">
+		<div class="note_alert_inner">
+			<div class="note_alert_icon"></div>
+			<p class="alert_text"></p>
+		</div>
+	</div>
+
+	<!-- Script Start -->
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/script.js"></script>
+	</body>
+</html>

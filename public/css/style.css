@@ -1,0 +1,934 @@
+/*--------------------- Copyright (c) 2020 ----------------------- 
+[Comman Stylesheet] 
+Project: Stick Notes
+Version: 1.0.0 
+Author: Kamleshyadav
+-------------------------------------------------------------------*/
+/*------------------------------------------------------------------
+[Table of contents]
+
+1. Global CSS
+2. PreLoader CSS
+3. Login/Register CSS Start
+4. Header CSS Start
+5. Main Container CSS Start
+6. Side Bar CSS Start
+7. Content CSS Start
+8. Popup CSS Start
+9. Alert CSS Start
+10. Responsive CSS Start
+------------------------------------------------------------------*/
+/********************************************************
+    1. Global CSS
+*******************************************************/
+/* scroll bar css start */
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+*::-webkit-scrollbar-track {
+    background-color: #e2e2e2;
+    border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb {
+    background-color: #4290f5;
+    border-radius: 10px;
+}
+*{
+    scrollbar-color: #f2f2f2 #4290f5;
+    scrollbar-width: thin;
+}
+.note_content textarea::-webkit-scrollbar-track{
+    background-color: rgba(255, 255, 255, 0.15);
+}
+.note_content textarea::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.30);
+}
+/* scroll bar css end */
+* {
+    outline: 0;
+}
+body {
+	font-family: 'Poppins', sans-serif;
+	font-weight: 400;
+	font-size: 14px;
+	line-height: 26px;
+	-webkit-font-smoothing: antialiased;
+    color: #4f575f;
+    background: #ffffff;
+    overflow: hidden;
+}
+a, a:hover, a:focus, button, button:hover {
+	text-decoration: none;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-ms-transition: all 0.5s;
+	-o-transition: all 0.5s;
+    transition: all 0.5s;
+    color: #4f575f;
+    outline: 0;
+}
+img {
+	max-width: 100%;
+}
+ul, p {
+	padding:0;
+	margin:0;
+	list-style-type: none;
+}
+h1, h2, h3, h4, h5, h6 {
+	margin:0;
+	padding:0;
+    text-transform:capitalize;
+    color: #222222;
+    font-family: 'Poppins', sans-serif;
+}
+.button {
+    width: 100%;
+    border-radius: 50px;
+    padding: .5em;
+    color: #ffffff;
+    background: #4290f5;
+    position: relative;
+    cursor: pointer;
+    border: 2px solid #4290f5;
+    font-weight: 500;
+    outline: 0 !important;
+}
+.button:hover {
+    color: #4290f5;
+    background: #ffffff;
+}
+.button:hover, .button {
+    -webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-ms-transition: all 0.5s;
+	-o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.button:disabled {
+    opacity: .7;
+}
+/********************************************************
+    2. PreLoader CSS
+*******************************************************/
+.preloader {
+	background-color: #ffffff;
+	bottom: 0;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 2147483647;
+	width: 100%;
+	height: 100%;
+}
+.status {
+    background-position: center center;
+    background-repeat: no-repeat;
+    height: auto;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    text-align: center;
+    transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+    -o-transform: translate(-50%,-50%);
+}
+/********************************************************
+    3. Login/Register CSS Start
+********************************************************/
+.welcome_wrapper {
+    background: #4290f5;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    background: url(../images/welcom_bg_img.jpg);
+}
+.welcome_holder {
+    margin: auto;
+    max-width: 500px;
+    width: 100%;
+    padding: 30px 15px;
+}
+.logo {
+    max-width: 180px;
+    margin: auto;
+    display: block;
+}
+.welcome_title {
+    text-align: center;
+    margin-top: 20px;
+    color: #4f575f;
+    font-size: 14px;
+    font-weight: 600;
+}
+.log_reg_form_wrapper {
+    background-color: #ffffff;
+    padding: 50px 30px;
+    border-radius: 20px;
+    margin-top: 42px;
+    box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.12);
+}
+.log_reg_form_wrapper ul.nav.nav-tabs {
+    border-bottom: 0;
+    margin: 40px 0 30px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.log_reg_form_wrapper li.nav-item {
+    margin-bottom: 0;
+}
+.log_reg_form_wrapper .nav-tabs .nav-link {
+    border: 0;
+    color: #4f575f;
+    font-weight: 500;
+}
+.log_reg_form_wrapper .nav-tabs .nav-link.active {
+    background-color: #ffffff;
+    border-bottom: 2px solid #4290f5;
+}
+.input_wrap {
+    position: relative;
+    margin: 20px 0;
+    display: block;
+}
+.input_wrap input {
+    width: 100%;
+    padding: 0 15px 0 50px;
+    border: 1px solid #d2d2d2;
+    border-radius: 50px;
+    font-size: 14px;
+    height: 45px;
+}
+.input_wrap input:focus {
+    border: 1px solid #5fc5ff;
+}
+.input_error {
+    font-size: 12px;
+    margin-top: 10px;
+    color: #ff6e66;
+    display: none;
+}
+.input_wrap i {
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+    left: 0;
+    padding: 15px 0;
+    font-size: 16px;
+    color: #4f575f;
+    cursor: default;
+    width: 3em;
+    text-align: center;
+}
+.input_wrap.invalid .input_error {
+    display: block;
+}
+.input_wrap.valid input {
+    border-color: #43eddc;
+}
+.input_wrap.invalid input {
+    border-color: #ff6e66;
+}
+.note_forgot_pws_link a {
+    color: #4290f5;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+    margin: 2px 0 22px;
+}
+#note_cancel {
+    color: red;
+}
+/********************************************************
+    4. Header CSS Start
+********************************************************/
+.header_wrapper {
+    background: #ffffff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 6;
+    max-height: 80px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.06);
+}
+.header_wrapper .row {
+    align-items: center;
+}
+.logo_wrap {
+    padding: 10px 0;
+}
+.logo_wrap img {
+    max-height: 60px;
+}
+.main_menu {
+    text-align: right;
+}
+.main_menu ul li a {
+    display: inline-block;
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    background: #4290f5;
+    margin: 15px 0;
+    border: none;
+    border-radius: 50%;
+    line-height: 40px;
+    color: #ffffff;
+}
+.main_menu ul li {
+    display: inline-block;
+}
+.main_menu ul li a {
+    margin-left: 30px;
+}
+.main_menu ul li:first-child a {
+    margin-left: 0;
+}
+.main_menu ul li a:hover {
+    background: #5fc5ff;
+    color: #ffffff;
+}
+/********************************************************
+    5. Main Container CSS Start
+********************************************************/
+.main_wrapper {
+    margin-top: 80px;
+}
+.notes_controller {
+    width: 100%;
+    display: block;
+}
+.notes_controller ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+.notes_controller ul li {
+    width: 50%;
+}
+.notes_controller a {
+    display: inline-block;
+    text-align: center;
+    min-width: 150px;
+    height: 40px;
+    background: #4290f5;
+    margin: 0 auto 20px;
+    border: none;
+    border-radius: 100px;
+    line-height: 40px;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+.notes_controller a:hover {
+    background: #5fc5ff;
+    color: #ffffff;
+}
+.notes_controller ul li:nth-child(2) {
+    text-align: right;
+}
+.draggableDiv {
+    padding: 0;
+}
+/********************************************************
+    6. Side Bar CSS Start
+********************************************************/
+.sidebar {
+    position: fixed;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    background: #4290f5;
+    width: 300px;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.06);
+}
+.sidebar_drawer {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 15px;
+    width: 100%;
+}
+.sidebar_drawer_box_title {
+    width: 100%;
+}
+.add_new_note {
+    background: #ffffff;
+    display: inline-block;
+    text-align: center;
+    line-height: 26px;
+    border-radius: 30px;
+    border: 2px solid #ffffff;
+    color: #4290f5;
+    height: 30px;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 0 10px;
+    /* position: fixed;
+    bottom: 0;
+    left: 15px;
+    z-index: 99; */
+}
+.add_new_note:hover {
+    background: transparent;
+    color: #ffffff;
+}
+.sidebar_drawer_box {
+    background: #ffffff;
+    padding: 6px 15px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 20px;
+    text-transform: capitalize;
+    font-weight: 600;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.06);
+}
+.sidebar_drawer_box:last-child{
+    margin-bottom: 0;
+}
+.sidebar_drawer_box:hover {
+    border-color: #4290f5;
+}
+.sidebar_drawer::-webkit-scrollbar {
+    width: 3px;
+}
+.sidebar_drawer::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+}
+.sidebar_drawer::-webkit-scrollbar-thumb {
+    background-color: #5fc5ff;
+}
+.sidebar_drawer_box_delete {
+    background: #4290f5;
+    text-align: center;
+    color: #ffffff;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 100%;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transform: translateY(-150px);
+    -ms-transform: translateY(-150px);
+    transform: translateY(-150px);
+}
+.sidebar_drawer_box_delete:hover {
+    background: #ff6e66;
+    color: #ffffff;
+}
+.sidebar_drawer_box.active_note {
+    background: #5fc5ff;
+    color: #ffffff;
+}
+.sidebar_drawer_box.active_note > span.note_date {
+    color: #ffffff;
+}
+.sidebar_drawer_box > span.note_date {
+    color: #5fc5ff;
+    font-size: 12px;
+    line-height: 18px;
+}
+.sidebar_drawer_box:hover .sidebar_drawer_box_delete {
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+.sidebar_drawer_box:hover .sidebar_drawer_box_delete, .sidebar_drawer_box .sidebar_drawer_box_delete, .sidebar_drawer_box, .sidebar_drawer_box:hover {
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.sidebar_drawer_box > span {
+    display: inline-block;
+    width: 100%;
+}
+.new_note_title {
+    background: #ffffff;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    position: relative;
+    cursor: default;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.06);
+    color: #4290f5;
+    width: auto;
+    display: inline-block;
+    font-weight: 600;
+    max-height: 110px;
+    margin-bottom: 20px;
+    padding: 15px 15px;
+}
+.new_note_title input {
+    background: #ffffff;
+    width: 100%;
+    padding: 0 20px;
+    border: 1px solid #d2d2d2;
+    border-radius: 100px;
+    font-size: 14px;
+    height: 45px;
+}
+.new_note_title a{
+    font-size: 12px;
+    margin: 0 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+.sub_title {
+    color: #ffffff;
+    font-size: 18px;
+    width: 100%;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.no_board {
+    text-align: center;
+    border-radius: 10px;
+    padding: 15px;
+    color: #FFF;
+    border: 1px solid #fff;
+    outline: none;
+}
+/********************************************************
+    7. Content CSS Start
+********************************************************/
+.content {
+    margin-left: 300px;
+    padding: 20px 20px;
+    height: 100vh;
+    display: block;
+    overflow: hidden;
+}
+.content_inner {
+    background: #ffffff;
+    height: 100%;
+    display: block;
+    position: relative;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.06);
+    background-image: radial-gradient(rgba(66, 144, 245, 0.28) 2px,transparent 2px);
+    background-size: 20px 20px;
+    border: none;
+    border-radius: 10px;
+    padding: 30px 10px;
+    overflow-y: auto;
+}
+.content_inner::-webkit-scrollbar {
+    width: 0px;
+}
+.content_inner::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+}
+.content_inner::-webkit-scrollbar-thumb {
+    background-color: #5fc5ff;
+}
+.note_box {
+    background: #ffffff;
+    width: 100%;
+    display: flex;
+    margin-bottom: 0px;
+    border: none;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.24);
+    flex-wrap: wrap;
+}
+.note_header {
+    padding: 8px 15px;
+    background: rgba(95, 197, 255, 0.80);
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+    position: relative;
+}
+.note_header a {
+    color: #5fc5ff;
+    background: #ffffff;
+    width: 30px;
+    display: inline-block;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    border: none;
+    border-radius: 50%;
+}
+.note_header a.close_note {
+    margin-right: 15px;
+}
+.note_content {
+    background: #ffffff;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.note_content textarea {
+    width: 100%;
+    border: none;
+    resize: none;
+    height: 200px;
+    padding: 15px;
+    background: #5fc5ff;
+    color: #ffffff;
+}
+.note_content textarea .text_bold {
+    font-weight: 700;
+}
+.color_options_box {
+    position: absolute;
+    left: 12px;
+    background: #ffffff;
+    display: flex;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 100px;
+    -webkit-transform: translateY(100px);
+	-moz-transform: translateY(100px);
+	-ms-transform: translateY(100px);
+	-o-transform: translateY(100px);
+    transform: translateY(100px);
+    opacity: 0;
+    visibility: hidden;
+}
+.color_options_box.show_option {
+    opacity: 1;
+    visibility: visible;
+    -webkit-transform: translateY(40px);
+	-moz-transform: translateY(40px);
+	-ms-transform: translateY(40px);
+	-o-transform: translateY(40px);
+    transform: translateY(40px);
+}
+.color_options_box.show_option, .color_options_box {
+    -webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-ms-transition: all 0.5s;
+	-o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.color_options_box > span {
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    margin: 0 3px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+}
+.color_options_box > span.color_pink {
+    background: #ff6e66;
+}
+.color_options_box > span.color_blue {
+    background: #5fc5ff;
+}
+.color_options_box > span.color_orange {
+    background: #ff9866;
+}
+.color_options_box > span.color_brown {
+    background: #512727;
+}
+
+.note_box.color_pink_wrap .note_header {
+    background: rgba(255, 110, 102, 0.80);
+}
+.note_box.color_pink_wrap .note_header a {
+    color: #ff6e66;
+}
+.note_box.color_pink_wrap .note_content textarea {
+    background: #ff6e66;
+}
+
+.note_box.color_blue_wrap .note_header {
+    background: rgba(95, 197, 255, .80);
+}
+.note_box.color_blue_wrap .note_header a {
+    color: #5fc5ff;
+}
+.note_box.color_blue_wrap .note_content textarea {
+    background: #5fc5ff;
+}
+
+.note_box.color_orange_wrap .note_header {
+    background: rgba(255, 152, 102, .80);
+}
+.note_box.color_orange_wrap .note_header a {
+    color: #ff9866;
+}
+.note_box.color_orange_wrap .note_content textarea {
+    background: #ff9866;
+}
+
+.note_box.color_brown_wrap .note_header {
+    background: rgba(81, 39, 39, 0.80);
+}
+.note_box.color_brown_wrap .note_header a {
+    color: #512727;
+}
+.note_box.color_brown_wrap .note_content textarea {
+    background: #512727;
+}
+.note_header {
+    cursor: all-scroll;
+}
+/********************************************************
+    8. Popup CSS Start
+********************************************************/
+.popup_container{
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 100%;
+    left: 0%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 99;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+}
+.popup_container.show {
+    opacity: 1;
+    visibility: visible;
+}
+.popup_container.show .popup_containerinner, .popup_container .popup_containerinner, .popup_container.show, .popup_container {
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+.popup_containerinner {
+    margin: auto;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 15px;
+    position: relative;
+    -webkit-transform: translateY(-100%);
+	-moz-transform: translateY(-100%);
+	-ms-transform: translateY(-100%);
+	-o-transform: translateY(-100%);
+    transform: translateY(-100%);
+}
+.popup_container.show .popup_containerinner {
+    opacity: 1;
+    visibility: visible;
+    -webkit-transform: translateY(0%);
+	-moz-transform: translateY(0%);
+	-ms-transform: translateY(0%);
+	-o-transform: translateY(0%);
+    transform: translateY(0%);
+}
+.popup_wrapper {
+    position: relative;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 40px;
+    text-align: center;
+}
+.popup_wrapper h4 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.popup_btn, .popup_btn:hover, .popup_btn:focus {
+    background: #F44336;
+    color: #ffffff;
+    min-width: 100px;
+    display: inline-block;
+    border: none;
+    border-radius: 100px;
+    height: 40px;
+    line-height: 38px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+.popup_container .close_btn {
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: #5fc5ff;
+    color: #ffffff;
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    line-height: 30px;
+    border: none;
+    border-radius: 50%;
+}
+.popup_btn.skyBlue {
+    background: #5fc5ff;
+    color: #ffffff;
+}
+/********************************************************
+    9. Alert CSS Start
+********************************************************/
+.message {
+    display: none;
+}
+.note_alert_wrapper {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+}
+.note_alert_wrapper.alert_open {
+    opacity: 1;
+    visibility: visible;
+}
+.note_alert_wrapper > .note_alert_inner {
+    background-color: #ffffff;
+    border-radius: 45px;
+    color: #ff9866;
+    flex-wrap: wrap;
+    max-width: 450px;
+    box-shadow: 0px 15px 50px 0px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 10px 20px;
+    border: 1px solid #ff9866;
+    min-width: 200px;
+    -webkit-transform: translateY(100px) scale(0.98);
+    -moz-transform: translateY(100px) scale(0.98);
+    transform: translateY(100px) scale(0.98);
+    -webkit-transition: all 0.3s cubic-bezier(0.845, 0.25, 0.2, 0.96);
+    -moz-transition: all 0.3s cubic-bezier(0.845, 0.25, 0.2, 0.96);
+    transition: all 0.3s cubic-bezier(0.845, 0.25, 0.2, 0.96);
+}
+.note_alert_wrapper.alert_open > .note_alert_inner {
+    -webkit-transform: translateY(0) scale(1);
+    -moz-transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1);
+}
+.note_alert_wrapper > .note_alert_inner > .message > p,
+.note_alert_wrapper > .note_alert_inner > p {
+    margin: 0;
+    width: calc(100% - 60px);
+    padding-left: 15px;
+}
+.note_alert_wrapper > .note_alert_inner:after {
+    content: "";
+    display: table;
+    width: 100%;
+}
+.note_alert_wrapper.note_error > .note_alert_inner {
+    color: #f44336;
+    border-color: #f44336;
+}
+.note_alert_wrapper.note_success > .note_alert_inner {
+    color: #4caf50;
+    border-color: #4caf50;
+}
+.note_alert_wrapper > .note_alert_inner > .message {
+    padding: 0 10px;
+}
+.note_alert_wrapper.msg.alert_open.note_success .note_alert_icon {
+    background: url(../images/happy.svg);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.note_alert_wrapper.msg.alert_open.note_error .note_alert_icon {
+    background: url(../images/sad.svg);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.note_alert_icon {
+    width: 60px;
+    height: 60px;
+}
+/********************************************************
+    10. Responsive CSS Start
+********************************************************/
+@media (min-width: 991.98px) {
+    .main_menu ul li a.toggle_btn {
+        display: none;
+    }
+}
+
+@media (min-width: 1199.98px) {
+    
+}
+
+@media (max-width: 991.98px) {
+    body .sidebar {
+        width: 0;
+    }
+    body .sidebar {
+        -webkit-transform: translateX(-300px);
+        -moz-transform: translateX(-300px);
+        -ms-transform: translateX(-300px);
+        -o-transform: translateX(-300px);
+        transform: translateX(-300px);
+    }
+    body .content {
+        margin-left: 0;
+    }
+    body.close_sidebar .sidebar {
+        width: 300px;
+    }
+    body.close_sidebar .sidebar {
+        -webkit-transform: translateX(0);
+        -moz-transform: translateX(0);
+        -ms-transform: translateX(0);
+        -o-transform: translateX(0);
+        transform: translateX(0);
+    }
+    body.close_sidebar .content {
+        margin-left: 300px;
+    }
+    body.close_sidebar .sidebar, .sidebar, body.close_sidebar .content, .content {
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        -ms-transition: all 0.5s;
+        -o-transition: all 0.5s;
+        transition: all 0.5s;
+    }
+    .add_new_note {
+        bottom: 80px;
+    }
+    .content_inner::-webkit-scrollbar {
+        width: 6px;
+    }
+}
+@media (max-width: 767.98px) {
+    .main_menu ul li a {
+        margin-left: 10px;
+    }
+    .notes_controller a {
+        min-width: 130px;
+    }
+}
+@media (max-width: 575.98px) {
+	
+}

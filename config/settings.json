@@ -1,0 +1,10 @@
+{
+      "SMTP_SERVICE" : "smtp",
+      "SMTP_HOST"    : "mail.yourdomain.com",
+      "SMTP_PORT"    : 465,
+
+      "EMAIL_FROM"   : "your@domain.com",
+      "EMAIL_PASS"   : "",
+      "EMAIL_TEXT"   : "Password for Sticky Notes",
+      "SUBJECT"      : "Password change request"
+}
