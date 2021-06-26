@@ -100,7 +100,7 @@ router.post('/:id', (req, res)=>{
                 noteDetails();
             }).catch(errorHandler);   
         });
-        res.json({status : true, message : 'Notes saved successfully!!'})
+        res.json({status : true, message : title + 'Notes saved successfully!!'})
     }
 });
 
