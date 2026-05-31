@@ -22,5 +22,10 @@ USER node
 
 EXPOSE 3005
 
+# Health check hits the app's /health endpoint (busybox wget ships in alpine).
+# Uses $PORT so it tracks whatever port the app is configured to listen on.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget -q -O- "http://127.0.0.1:${PORT:-3005}/health" || exit 1
+
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "app.js"]
