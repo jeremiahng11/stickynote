@@ -967,3 +967,33 @@ h1, h2, h3, h4, h5, h6 {
     bottom: 3px;
     background-position: -64px -224px;
 }
+
+/********************************************************
+    Floating "Add note" button (+)
+********************************************************/
+.add_note_fab {
+    position: fixed;
+    right: 32px;
+    bottom: 32px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #4290f5;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+.add_note_fab:hover {
+    background: #2f7be0;
+    color: #ffffff;
+    transform: scale(1.08);
+}
+.add_note_fab i {
+    pointer-events: none;
+}

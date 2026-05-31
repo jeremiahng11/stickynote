@@ -156,7 +156,6 @@ function runAutoSave(tid) {
 						var url = window.location.href;
 						$('.see_notes').show();
 						$('.add_note_box').show();
-						$('.save_btn').show();
 						$('.see_notes').attr('notes_see', id);
 						$('.add_note_box').attr('board_id',id);
 						$('.sidebar_drawer_box').removeClass('active_note');
@@ -272,11 +271,6 @@ function runAutoSave(tid) {
 							$(this).parents('.note_box').attr('text_data', JSON.stringify(data))
 						}
 						scheduleAutoSave();
-					});
-
-					$(document).on('click','.save_btn', function(){
-						var tid = $('.add_note_box').attr('board_id');
-						autoSave(tid);
 					});
 
 					$(document).on('click','.draggableDiv ',function(){

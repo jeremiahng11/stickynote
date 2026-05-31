@@ -112,14 +112,17 @@ router.post('/:id', async (req, res)=>{
             // update existing notes (await so the response reflects the real result)
             await Promise.all(oldData.map((o)=> Notes.update(o.values,{where : {id : o.id}})));
 
-            // create new notes and capture their generated ids (in submission order)
+            // create new notes one by one so we reliably get each generated id
+            // (bulkCreate does not return autoincrement ids on all MySQL setups,
+            // which caused the client to re-create notes -> duplicates)
             let created = [];
-            if(newData.length != 0){
-                created = await Notes.bulkCreate(newData);
+            for(let n=0; n<newData.length; n++){
+                const row = await Notes.create(newData[n]);
+                created.push(row.id);
             }
 
             // returning the new ids lets the client adopt them and avoid duplicate inserts
-            return res.json({status : true, message :  'Notes saved successfully!!', created : created.map((c)=> c.id)})
+            return res.json({status : true, message :  'Notes saved successfully!!', created : created})
         }catch(err){
             console.log('Notes save error:', err && err.stack ? err.stack : err)
             return res.json({status : false, message : 'Notes not saved.', error : (err && err.message) ? err.message : String(err)})
