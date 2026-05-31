@@ -1,4 +1,5 @@
 const express = require('express');
+const { Op } = require('sequelize');
 const router = express.Router();
 
 //require models
@@ -63,7 +64,7 @@ router.post('/', (req, res)=>{
 
 router.get('/:id', (req, res)=>{ 
     //findAll Notes 
-    Notes.findAll({attributes:["id","note","xPos","yPos","width","height","color","boardId","visible"],where : {boardId : req.params.id}}).then((notes)=>{
+    Notes.findAll({attributes:["id","note","xPos","yPos","width","height","color","boardId","visible"],where : {boardId : req.params.id, id : {[Op.gt] : 0}}}).then((notes)=>{
         res.json({status : true, notesData : notes})
     }).catch(errorHandler);
 });

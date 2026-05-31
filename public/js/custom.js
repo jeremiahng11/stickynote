@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-l (cid for all new notes)');
+console.log('[stickynotes] custom.js build 2026-05-31-m (filter id<=0 notes)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
