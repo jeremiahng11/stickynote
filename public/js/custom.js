@@ -12,7 +12,8 @@ var autoSaveTimer = null;
 var autoSaveInFlight = false;   // a save request is currently running
 var autoSavePending = false;    // changes happened while a save was running
 function currentBoardId() {
-	return $('.add_note_box').attr('board_id');
+	// prefer the controller attribute, fall back to the active board in the sidebar
+	return $('.add_note_box').attr('board_id') || $('.sidebar_drawer_box.active_note').attr('title_id');
 }
 function scheduleAutoSave() {
 	var tid = currentBoardId();
