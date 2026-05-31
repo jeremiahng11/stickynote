@@ -11,16 +11,27 @@ const errorHandler = (err, res) =>{
     console.log("Error :"+err)
 }
 
-router.get('/', (req, res)=>{ 
+router.get('/', (req, res)=>{
     if(req.session.Id){
         //Here you will find user who loggedIn
-        Users.findOne({where : {id : req.session.Id}}).then((users)=>{                            
+        Users.findOne({where : {id : req.session.Id}}).then((users)=>{
+            //session points to a user that no longer exists -> send back to login
+            if(!users){
+                req.session.destroy(()=>{});
+                return res.redirect('/');
+            }
             //findAll stickyBoard which is loggedIn user created
             board.findAll({where : {userId : users.id},order : [['id' , 'DESC']], include: [{ model: Notes, attributes: ['id','note']}]
-            }).then((boardData) =>{  
+            }).then((boardData) =>{
                 res.render('index',{board : boardData})
-            }).catch(errorHandler);
-        }).catch(errorHandler);
+            }).catch((err)=>{
+                console.log("Error :"+err)
+                res.status(500).send('Something went wrong loading your boards.')
+            });
+        }).catch((err)=>{
+            console.log("Error :"+err)
+            res.status(500).send('Something went wrong loading your boards.')
+        });
     }else{
         res.redirect('/');
     }

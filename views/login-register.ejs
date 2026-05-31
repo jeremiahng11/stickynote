@@ -23,9 +23,11 @@
 					<li class="nav-item">
 						<a class="nav-link active" id="login_tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="true">Login</a>
 					</li>
+					<% if (signupEnabled) { %>
 					<li class="nav-item">
 						<a class="nav-link" id="register_tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">Register</a>
 					</li>
+					<% } %>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane fade active show" id="login" role="tabpanel" aria-labelledby="login_tab">
@@ -54,6 +56,7 @@
 							</form>
 						</div>
 					</div>
+					<% if (signupEnabled) { %>
 					<div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register_tab">
 						<form class="" id="regForm">
 							<div class="input_wrap reg" id="email1Div">
@@ -79,7 +82,8 @@
 							</div>
 							<button type="button" class="button" id="button1" onclick="register()">Sign Up</button>
 						</form>
-					</div>				  
+					</div>
+					<% } %>
 				</div>
 			</div>
 		</div>

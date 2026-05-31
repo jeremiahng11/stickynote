@@ -6,6 +6,9 @@ const router = express.Router();
 const Users = require('../models/users');
 const sendMail = require('../config/mailapi');
 
+// Registration toggle: SIGNUP=1 (or unset) enables sign up, SIGNUP=0 disables it.
+const signupEnabled = (process.env.SIGNUP || '1') !== '0';
+
 //errorHandler Function
 const errorHandler = (err, res) =>{
       console.log("Error :"+err)
@@ -13,7 +16,7 @@ const errorHandler = (err, res) =>{
 }
 
 router.get('/',(req, res)=>{
-      res.render('login-register');
+      res.render('login-register', { signupEnabled });
 });
 
 router.post('/login-register',(req, res)=>{ 
@@ -22,8 +25,12 @@ router.post('/login-register',(req, res)=>{
       var cpass = req.body.cpass
       
       if(email && password && cpass){
+            //block registration when sign up is disabled
+            if(!signupEnabled){
+                  return res.json({status : false, message:'Registration is currently disabled.'})
+            }
             //find email address is exist or not
-            Users.findOne({where : {email : email}}).then((result)=>{ 
+            Users.findOne({where : {email : email}}).then((result)=>{
                   if(result){
                         res.json({status : false, message:'User already exists...Try another Email address!!'}) 
                   }else{

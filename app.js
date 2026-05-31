@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const mysql = require('mysql2/promise');
 const MySQLStore = require('express-mysql-session')(session);
 
 const con = require('./models/connection');
@@ -35,15 +36,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Persist sessions in MySQL so they survive restarts / redeploys.
-// The store auto-creates its `sessions` table on first use.
-const sessionStore = new MySQLStore({
+// We build the mysql2 pool ourselves and pass it in, because
+// express-mysql-session's option whitelist drops `ssl` — which would break
+// against a server that enforces require_secure_transport.
+const sessionPool = mysql.createPool({
     host: dbConfig.host,
     port: dbConfig.port,
     user: dbConfig.username,
     password: dbConfig.password,
     database: dbConfig.database,
     ...(dbConfig.ssl ? { ssl: { rejectUnauthorized: false } } : {}),
-    createDatabaseTable: true,
+});
+
+const sessionStore = new MySQLStore({ createDatabaseTable: true }, sessionPool);
+sessionStore.on('error', (err) => {
+    console.error('Session store error:', err.message);
 });
 
 app.use(
@@ -79,6 +86,13 @@ app.get('/health', (req, res) => {
 
 app.use('/', userRouter);
 app.use('/stickyBoard', stickyRouter);
+
+// Surface the real error in logs instead of a bare "Internal Server Error".
+app.use(function (err, req, res, next) {
+    console.error('Unhandled error:', err.stack || err);
+    if (res.headersSent) return next(err);
+    res.status(500).send('Internal Server Error');
+});
 
 async function start() {
     try {
