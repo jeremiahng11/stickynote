@@ -3,11 +3,11 @@ const config = require('../config/db');
 
 const db = config.data;
 
-// Enable TLS when the server requires secure transport (set DB_SSL=true).
+// TLS is enabled when the server requires secure transport (DB_SSL=true).
 // rejectUnauthorized is off because managed DBs (Coolify) use self-signed certs.
-const useSsl = process.env.DB_SSL === 'true';
-
-const dialectOptions = {
+const con = new Sequelize(db.database, db.username, db.password, {
+    host: db.host,
+    port: db.port,
     dialect: 'mysql',
     logging: false,
     pool: {
@@ -16,20 +16,10 @@ const dialectOptions = {
         acquire: 30000,
         idle: 10000,
     },
-    ...(useSsl
+    ...(db.ssl
         ? { dialectOptions: { ssl: { rejectUnauthorized: false } } }
         : {}),
-};
-
-// Prefer a single connection URL (e.g. the one Coolify provides) when present;
-// otherwise fall back to the discrete DB_* variables.
-const con = process.env.DATABASE_URL
-    ? new Sequelize(process.env.DATABASE_URL, dialectOptions)
-    : new Sequelize(db.database, db.username, db.password, {
-          host: db.host,
-          port: db.port,
-          ...dialectOptions,
-      });
+});
 
 // Retry the initial connection so the app can start before the DB is ready
 // (common in container orchestration like Coolify / docker-compose).

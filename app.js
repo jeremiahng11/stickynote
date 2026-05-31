@@ -3,8 +3,10 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 
 const con = require('./models/connection');
+const dbConfig = require('./config/db').data;
 const userRouter = require('./routes/users');
 const stickyRouter = require('./routes/sticky_board');
 
@@ -32,11 +34,24 @@ app.use(express.urlencoded({ extended: false }));
 // static assets
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Persist sessions in MySQL so they survive restarts / redeploys.
+// The store auto-creates its `sessions` table on first use.
+const sessionStore = new MySQLStore({
+    host: dbConfig.host,
+    port: dbConfig.port,
+    user: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.database,
+    ...(dbConfig.ssl ? { ssl: { rejectUnauthorized: false } } : {}),
+    createDatabaseTable: true,
+});
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET || 'stickyNotes123#',
+        store: sessionStore,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         cookie: {
             secure: process.env.COOKIE_SECURE === 'true',
             httpOnly: true,
