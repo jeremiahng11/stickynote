@@ -68,50 +68,47 @@ router.get('/:id', (req, res)=>{
     }).catch(errorHandler);
 });
 
-router.post('/:id', (req, res)=>{ 
+router.post('/:id', async (req, res)=>{
     if(req.body.id){
          //for delete notes
-        Notes.destroy({where : {id : req.body.id}}).then((data)=>{                                    
-            res.json({status : true, message : 'Note deleted successfully!!'})
-        }).catch((err)=>{
-            res.json({status: false, message : 'Note not deleted.'})
-        });
+        try{
+            await Notes.destroy({where : {id : req.body.id}});
+            return res.json({status : true, message : 'Note deleted successfully!!'})
+        }catch(err){
+            console.log("Error :"+err)
+            return res.json({status: false, message : 'Note not deleted.'})
+        }
     }else{
-        var arr = JSON.parse(req.body.data)
-        var newData = [];
-        var oldData = [];
-        for(let i=0; i<arr.length; i++){
-            let data = JSON.parse(arr[i])
-            if(data.id == 0){
-                data.boardId = req.params.id;
-                newData.push(data)
-            }else{
-                oldData.push(data)
+        try{
+            var arr = JSON.parse(req.body.data)
+            var newData = [];
+            var oldData = [];
+            for(let i=0; i<arr.length; i++){
+                let data = JSON.parse(arr[i])
+                if(data.id == 0){
+                    delete data.id;            // let the DB assign the primary key
+                    data.boardId = req.params.id;
+                    newData.push(data)
+                }else{
+                    oldData.push(data)
+                }
             }
-        }
 
-        if(newData.length != 0){ 
-            // for create a new note or bulk note
-            Notes.bulkCreate(newData).then((notesData)=>{      
-            }).catch(errorHandler);
-        }
+            // update existing notes (await so the response reflects the real result)
+            await Promise.all(oldData.map((data)=> Notes.update(data,{where : {id : data.id}})));
 
-        let notesList = [];
-        oldData.forEach(function(data){ 
-            //for update note data
-            Notes.update(data,{where : {id : data.id}}).then(async data =>{       
-                let index = 0;
-                let noteDetails = async () => {
-                    let noteData = await data[index];
-                    notesList.push({
-                        noteData
-                    });
-                    index++;            
-                };
-                noteDetails();
-            }).catch(errorHandler);   
-        });
-        res.json({status : true, message :  'Notes saved successfully!!'})
+            // create new notes and capture their generated ids (in submission order)
+            let created = [];
+            if(newData.length != 0){
+                created = await Notes.bulkCreate(newData);
+            }
+
+            // returning the new ids lets the client adopt them and avoid duplicate inserts
+            return res.json({status : true, message :  'Notes saved successfully!!', created : created.map((c)=> c.id)})
+        }catch(err){
+            console.log("Error :"+err)
+            return res.json({status : false, message : 'Notes not saved.'})
+        }
     }
 });
 

@@ -2,6 +2,38 @@
 /*--------------------- Copyright (c) 2020 -----------------------
 [Master Javascript]
 -------------------------------------------------------------------*/
+
+// Default square sticky size (like a real post-it pad), in px.
+var NOTE_SIZE = 200;
+
+// Debounced auto-save so edits (move, resize, type, color, hide) persist
+// automatically without spamming the server.
+var autoSaveTimer = null;
+var autoSaveInFlight = false;   // a save request is currently running
+var autoSavePending = false;    // changes happened while a save was running
+function currentBoardId() {
+	return $('.add_note_box').attr('board_id');
+}
+function scheduleAutoSave() {
+	var tid = currentBoardId();
+	if (!tid) { return; }
+	clearTimeout(autoSaveTimer);
+	autoSaveTimer = setTimeout(function () { runAutoSave(tid); }, 600);
+}
+function runAutoSave(tid) {
+	// never run two saves at once: a second save for a still-uncreated note
+	// would insert a duplicate before the first response assigns its id
+	if (autoSaveInFlight) { autoSavePending = true; return; }
+	autoSaveInFlight = true;
+	autoSave(tid, {
+		silent: true,
+		done: function () {
+			autoSaveInFlight = false;
+			if (autoSavePending) { autoSavePending = false; runAutoSave(tid); }
+		}
+	});
+}
+
 (function ($) {
 	"use strict";
 	/*-----------------------------------------------------
@@ -117,7 +149,7 @@
 					$('.sidebar_drawer').on("click",".sidebar_drawer_box > span",function(){
 						var tid = $('.sidebar_drawer_box.active_note').attr('title_id'); 
 						if(tid){
-							autoSave(tid);
+							autoSave(tid, { silent: true });
 						}
 						var id = $(this).parents('.sidebar_drawer_box').attr('title_id'); 
 						var url = window.location.href;
@@ -135,12 +167,12 @@
 							for (var i = 0; i < resNotes.length; i++) {
 								if(resNotes[i].visible == 1){ 
 									if(resNotes[i].note == null){   
-										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||'260px')+'; height: '+(resNotes[i].height||'260px')+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
+										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
 									}else{
-										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||'260px')+'; height: '+(resNotes[i].height||'260px')+';"><div class="note_box '+resNotes[i].color+'_wrap"  text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
+										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap"  text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
 									}	
 								}else{
-									noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv note_close" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||'260px')+'; height: '+(resNotes[i].height||'260px')+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
+									noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv note_close" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
 									$('.see_notes').css('opacity','');
 									$('.see_notes').css('pointer-events','inherit');
 								}
@@ -163,7 +195,7 @@
 									data.color = color
 									$(this).find('.note_box').attr('text_data', JSON.stringify(data))
 								}
-								
+								scheduleAutoSave();
 							});
 							makeNoteResizable($(".content_inner .container-fluid .row").find('.col-xl-3'));
 							$('.note_close').hide();
@@ -177,8 +209,8 @@
 							var x = e.pageX - elm.position().left; 
 							var y = e.pageY - elm.position().top;
 							
-							var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:'+x+'px; top:'+y+'px; width:260px; height:260px;">'
-										+	'<div class="note_box" text_data={"id":0,"note":"","xPos":"'+x+'px","yPos":"'+y+'px","width":"260px","height":"260px","color":"color_blue","visible":"1"}>'
+							var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:'+x+'px; top:'+y+'px; width:'+NOTE_SIZE+'px; height:'+NOTE_SIZE+'px;">'
+										+	'<div class="note_box" text_data={"id":0,"note":"","xPos":"'+x+'px","yPos":"'+y+'px","width":"'+NOTE_SIZE+'px","height":"'+NOTE_SIZE+'px","color":"color_blue","visible":"1"}>'
 										+		'<div class="note_header">'
 										+			'<span>'
 										+				'<a class="color_options" href="javascript:void(0);">'
@@ -226,6 +258,7 @@
 									var data = JSON.stringify({id : 0, note:note, xPos : xPos+'px', yPos : yPos+'px', width : $(this).css('width'), height : $(this).css('height'), color : color, visible : "1"})
 									$(this).find('.note_box').attr('text_data', data)
 								}
+								scheduleAutoSave();
 							});
 							makeNoteResizable($(".content_inner .container-fluid .row").find('.col-xl-3'));
 						}
@@ -257,6 +290,7 @@
 							var data = JSON.stringify({id : 0,note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color, visible : "1"})
 							$(this).parents('.note_box').attr('text_data', data)
 						}
+						scheduleAutoSave();
 					});
 
 					$(document).on('click','.color_options_box span',function(){
@@ -272,6 +306,7 @@
 							data.color = color
 							$(this).parents('.note_box').attr('text_data', JSON.stringify(data))
 						}
+						scheduleAutoSave();
 					});
 
 					$(document).on('click','.save_btn', function(){
@@ -311,6 +346,7 @@
 							$('.note_close').hide();
 							$(this).parents('.note_box').attr('text_data', data)
 						}
+						scheduleAutoSave();
 					});
 
 					$(document).on('click','.delete_note',function(){
@@ -343,6 +379,7 @@
 								$('.draggableDiv').show();
 							}
 						});
+						scheduleAutoSave();
 					});
 
 				});
@@ -549,7 +586,7 @@ function makeNoteResizable($cols) {
 		$col.data('resizable-init', true);
 		$col.resizable({
 			handles: "n, e, s, w, ne, se, sw, nw",
-			minWidth: 150,
+			minWidth: 140,
 			minHeight: 120,
 			stop: function (event, ui) {
 				var $box = $(this).find('.note_box');
@@ -558,6 +595,8 @@ function makeNoteResizable($cols) {
 				attr.width = Math.round(ui.size.width) + 'px';
 				attr.height = Math.round(ui.size.height) + 'px';
 				$box.attr('text_data', JSON.stringify(attr));
+				// auto-save the new size
+				scheduleAutoSave();
 			}
 		});
 	});
@@ -568,37 +607,57 @@ function htmlEntities(str) {
 }
 
 function entities(str) {
-    return String(str).replace('&amp;', '&').replace('&lt;','<').replace('&gt;','>').replace('&quot;','"').replace("&eq;","'");
+    return String(str).replace(/&amp;/g, '&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&eq;/g,"'");
 }
 
-function autoSave(tid){
+function autoSave(tid, opts){
+	opts = opts || {};
 	var url = window.location.href;
-	
-	var arr = [];
 
-	$('.note_box').each(function(i,v){
-		if(($(this).attr('text_data'))!=null){
-			arr.push($(this).attr('text_data'))
+	var arr = [];
+	var newBoxes = [];   // note_box elements that are not yet in the DB (id == 0)
+
+	$('.note_box').each(function(){
+		var td = $(this).attr('text_data');
+		if(td != null){
+			arr.push(td);
+			try{ if(JSON.parse(td).id == 0){ newBoxes.push($(this)); } }catch(e){}
 		}
-	})
+	});
 	var data = JSON.stringify(arr)
-	$.post(url+tid,{data : data} , function(response){ 
+	$.post(url+tid,{data : data} , function(response){
 		if(response.status == true){
-			$(".sidebar_drawer_box").each(function(i,v){
+			// adopt the DB-assigned ids for the newly created notes so the next
+			// save updates them instead of inserting duplicates
+			if(response.created && response.created.length){
+				for(var i=0; i<newBoxes.length && i<response.created.length; i++){
+					var $box = newBoxes[i];
+					var newId = response.created[i];
+					try{
+						var attr = JSON.parse($box.attr('text_data'));
+						attr.id = newId;
+						$box.attr('text_data', JSON.stringify(attr));
+					}catch(e){}
+					$box.find('.note_content textarea').attr('note_id', newId);
+					$box.find('.note_header').attr('note_header_id', newId);
+					$box.find('.close_note').attr('close_note_id', newId);
+					$box.find('.delete_note').attr('delete_note_id', newId);
+				}
+			}
+
+			$(".sidebar_drawer_box").each(function(){
 				if(($(this).attr('title_id'))==tid){
-					if(($(".note_box").length)!=0){
-						$(this).find(".note_count b").html($(".note_box").length);
-						let typeAlert='ok';
-						let message = response.message
-						isValid(typeAlert,message);
-					}
+					$(this).find(".note_count b").html($(".note_box").length);
 				}
 			});
-	
+
+			if(!opts.silent){
+				isValid('ok', response.message);
+			}
 		}else{
-			let typeAlert='error';
-			let message = response.message
-			isValid(typeAlert,message);
+			isValid('error', response.message);
 		}
+	}).always(function(){
+		if(typeof opts.done === 'function'){ opts.done(); }
 	});
 }
