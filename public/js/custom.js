@@ -165,7 +165,10 @@ function runAutoSave(tid) {
 							var resNotes = response.notesData;
 							var noteTemp ='';
 							for (var i = 0; i < resNotes.length; i++) {
-								if(resNotes[i].visible == 1){ 
+								// clamp sizes so a corrupted/oversized value can't render full-width
+								resNotes[i].width = sanitizeSize(resNotes[i].width, NOTE_SIZE);
+								resNotes[i].height = sanitizeSize(resNotes[i].height, NOTE_SIZE);
+								if(resNotes[i].visible == 1){
 									if(resNotes[i].note == null){   
 										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+attrEscape(JSON.stringify(resNotes[i]))+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
 									}else{
@@ -218,12 +221,8 @@ function runAutoSave(tid) {
 
 					// "Add New" button: drop a note at a staggered position so many
 					// notes don't stack exactly on top of each other.
-					// Guard against a rapid double-click creating two notes.
-					var lastAddClick = 0;
+					// (addNoteAt guards against rapid double-clicks creating two notes.)
 					$(document).on("click",".add_note_box", function(){
-						var now = (new Date()).getTime();
-						if(now - lastAddClick < 500){ return; }
-						lastAddClick = now;
 						if(boardIsActive()){
 							var count = $('.content_inner .note_box').length;
 							var offset = (count % 8) * 28;
@@ -552,6 +551,8 @@ function makeNoteResizable($cols) {
 			handles: "n, e, s, w, ne, se, sw, nw",
 			minWidth: 140,
 			minHeight: 120,
+			maxWidth: 1000,
+			maxHeight: 1000,
 			stop: function (event, ui) {
 				var $box = $(this).find('.note_box');
 				if (!$box.attr('text_data')) { return; }
@@ -566,9 +567,26 @@ function makeNoteResizable($cols) {
 	});
 }
 
+// Clamp a stored size value (e.g. "320px") to a sane range so a corrupted or
+// runaway value can never render a note full-width. Returns "<n>px".
+function sanitizeSize(val, def) {
+	var n = parseInt(val, 10);
+	if (isNaN(n)) { return def + 'px'; }
+	if (n < 120) { return '120px'; }
+	// resizing is capped at 1000, so anything larger is corrupted data -> default
+	if (n > 1000) { return def + 'px'; }
+	return n + 'px';
+}
+
+// shared across all bindings so a double-click / duplicate binding can't add twice
+var lastNoteAddTime = 0;
+
 // Create a new sticky note at (x, y) within the active board and return it.
 // Shared by double-click and the "Add New" button so any number can be added.
 function addNoteAt(x, y) {
+	var nowTs = (new Date()).getTime();
+	if (nowTs - lastNoteAddTime < 500) { return null; }
+	lastNoteAddTime = nowTs;
 	var note = {
 		id: 0, note: "", xPos: x + 'px', yPos: y + 'px',
 		width: NOTE_SIZE + 'px', height: NOTE_SIZE + 'px',
