@@ -21,9 +21,19 @@ const app = express();
 const port = parseInt(process.env.PORT || '3005', 10);
 const hostname = process.env.HOST || '0.0.0.0';
 
+// Changes every deploy/restart; appended to static asset URLs so a new build
+// busts any browser/Cloudflare cache instead of serving stale JS/CSS.
+const ASSET_VERSION = Date.now().toString();
+
 // set views engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// expose the asset version to all views
+app.use(function (req, res, next) {
+    res.locals.assetVersion = ASSET_VERSION;
+    next();
+});
 
 // trust the reverse proxy in front of the app (Coolify / Traefik)
 app.set('trust proxy', 1);
