@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-m (filter id<=0 notes)');
+console.log('[stickynotes] custom.js build 2026-05-31-n (dump id=0 notes)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -667,6 +667,7 @@ function autoSave(tid, opts){
 		try{
 			var a = JSON.parse(td);
 			if(!a.id || a.id == 0){
+				console.log('[stickynotes] id=0 note found ->', JSON.stringify(a));
 				// every unsaved note must carry a cid so the server-assigned id can
 				// be reconciled back; assign one if it's missing (e.g. leftover notes)
 				if(!a.cid){ a.cid = 'c' + (++clientNoteSeq); }
