@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-h (single-add guard active)');
+console.log('[stickynotes] custom.js build 2026-05-31-i (add diagnostics)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -588,7 +588,8 @@ var lastNoteAddTime = 0;
 // Shared by double-click and the "Add New" button so any number can be added.
 function addNoteAt(x, y) {
 	var nowTs = (new Date()).getTime();
-	if (nowTs - lastNoteAddTime < 500) { return null; }
+	console.log('[stickynotes] addNoteAt called', x, y, 'dt=' + (nowTs - lastNoteAddTime));
+	if (nowTs - lastNoteAddTime < 500) { console.log('[stickynotes] addNoteAt BLOCKED by guard'); return null; }
 	lastNoteAddTime = nowTs;
 	var note = {
 		id: 0, note: "", xPos: x + 'px', yPos: y + 'px',
@@ -607,6 +608,7 @@ function addNoteAt(x, y) {
 
 	var $note = $(html).hide();
 	$note.appendTo(".content_inner .container-fluid .row").show("fade", 300);
+	console.log('[stickynotes] note appended; total notes in DOM now:', $('.content_inner .note_box').length);
 	$note.draggable({ containment: "parent" }).on('dragstop', function (e, ui) {
 		var xPos = ui.position.left;
 		var yPos = ui.position.top;
