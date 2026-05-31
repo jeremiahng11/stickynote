@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-i (add diagnostics)');
+console.log('[stickynotes] custom.js build 2026-05-31-j (save diagnostics)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -667,7 +667,9 @@ function autoSave(tid, opts){
 		}
 	});
 	var data = JSON.stringify(arr)
+	console.log('[stickynotes] autoSave -> board', tid, '| total notes:', arr.length, '| new (id=0):', newBoxes.length);
 	$.post(url+tid,{data : data} , function(response){
+		console.log('[stickynotes] autoSave response:', response.status, '| created ids:', JSON.stringify(response.created));
 		if(response.status == true){
 			// adopt the DB-assigned ids for the newly created notes so the next
 			// save updates them instead of inserting duplicates
