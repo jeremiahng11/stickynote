@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-n (dump id=0 notes)');
+console.log('[stickynotes] custom.js build 2026-05-31-o (dump render)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -185,6 +185,8 @@ function runAutoSave(tid) {
 							} 
 
 							$(".content_inner .container-fluid .row").html(noteTemp);
+							console.log('[stickynotes] RENDER board', id, '-> got', resNotes.length, 'notes from server');
+							$('.content_inner .note_box').each(function(){ console.log('   rendered:', $(this).attr('text_data')); });
 							$(".content_inner .container-fluid .row").find('.col-xl-3').draggable({containment : "parent"}).on('dragstop', function( event, ui ) {
 								var xpos = ui.position.left;
 								var ypos = ui.position.top;
