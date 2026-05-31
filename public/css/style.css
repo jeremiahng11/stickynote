@@ -960,12 +960,19 @@ h1, h2, h3, h4, h5, h6 {
 .content_inner .draggableDiv .ui-resizable-handle {
     z-index: 90;
 }
+/* jQuery UI's theme references an icon sprite image we don't ship, which 404s.
+   Disable the image and draw the resize grip with CSS instead. */
+.ui-icon {
+    background-image: none !important;
+}
 .content_inner .draggableDiv .ui-resizable-se {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     right: 3px;
     bottom: 3px;
-    background-position: -64px -224px;
+    background: none;
+    border-right: 3px double rgba(0, 0, 0, 0.35);
+    border-bottom: 3px double rgba(0, 0, 0, 0.35);
 }
 
 /********************************************************
