@@ -127,11 +127,24 @@ async function ensureNoteSizeColumns() {
     }
 }
 
+// Remove any corrupt notes with a non-positive primary key. Such a row would be
+// read by the client as id=0 (a "new" note) and re-created on every save.
+async function cleanupBadNotes() {
+    try {
+        const [result] = await con.query('DELETE FROM sn_notes WHERE id IS NULL OR id <= 0');
+        const removed = (result && (result.affectedRows || 0)) || 0;
+        if (removed) { console.log('Removed ' + removed + ' corrupt note row(s) with id <= 0'); }
+    } catch (err) {
+        console.log('Could not clean up bad notes: ' + err.message);
+    }
+}
+
 async function start() {
     try {
         await con.connectWithRetry();
         await con.sync();
         await ensureNoteSizeColumns();
+        await cleanupBadNotes();
         console.log('Database synced');
 
         app.listen(port, hostname, function () {
