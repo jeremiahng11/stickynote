@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-p (removed drag.js duplicate)');
+console.log('[stickynotes] custom.js build 2026-05-31-q (remember active board)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -147,7 +147,16 @@ function runAutoSave(tid) {
 					});
 
 					window.onload = function() {
-						$('.sidebar_drawer_box > span').first().click();
+						// restore the board the user was last viewing (survives refresh),
+						// falling back to the first board if none/invalid
+						var savedId = null;
+						try{ savedId = localStorage.getItem('activeBoardId'); }catch(e){}
+						var $target = savedId ? $('.sidebar_drawer_box[title_id="'+savedId+'"]') : $();
+						if($target.length){
+							$target.find('> span').first().click();
+						}else{
+							$('.sidebar_drawer_box > span').first().click();
+						}
 					};
 
 					$('.sidebar_drawer').on("click",".sidebar_drawer_box > span",function(){
@@ -155,8 +164,10 @@ function runAutoSave(tid) {
 						if(tid){
 							autoSave(tid, { silent: true });
 						}
-						var id = $(this).parents('.sidebar_drawer_box').attr('title_id'); 
+						var id = $(this).parents('.sidebar_drawer_box').attr('title_id');
 						var url = window.location.href;
+						// remember this board so a refresh reopens it
+						try{ localStorage.setItem('activeBoardId', id); }catch(e){}
 						$('.see_notes').show();
 						$('.add_note_box').show();
 						$('.see_notes').attr('notes_see', id);
