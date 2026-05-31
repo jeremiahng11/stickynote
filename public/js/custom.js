@@ -217,8 +217,13 @@ function runAutoSave(tid) {
 					});
 
 					// "Add New" button: drop a note at a staggered position so many
-					// notes don't stack exactly on top of each other
+					// notes don't stack exactly on top of each other.
+					// Guard against a rapid double-click creating two notes.
+					var lastAddClick = 0;
 					$(document).on("click",".add_note_box", function(){
+						var now = (new Date()).getTime();
+						if(now - lastAddClick < 500){ return; }
+						lastAddClick = now;
 						if(boardIsActive()){
 							var count = $('.content_inner .note_box').length;
 							var offset = (count % 8) * 28;
