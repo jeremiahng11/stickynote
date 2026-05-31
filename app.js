@@ -29,9 +29,13 @@ const ASSET_VERSION = Date.now().toString();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// expose the asset version to all views
+// expose the asset version to all views and keep HTML pages uncached so they
+// always reference the latest asset URLs (static files keep normal caching)
 app.use(function (req, res, next) {
     res.locals.assetVersion = ASSET_VERSION;
+    if (req.method === 'GET' && req.accepts('html') && !req.path.startsWith('/css') && !req.path.startsWith('/js') && !req.path.startsWith('/images')) {
+        res.set('Cache-Control', 'no-store');
+    }
     next();
 });
 
