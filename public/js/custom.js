@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-j (save diagnostics)');
+console.log('[stickynotes] custom.js build 2026-05-31-k (cid reconcile)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -258,7 +258,7 @@ function runAutoSave(tid) {
 							data.note = note 
 							$(this).parents('.note_box').attr('text_data', JSON.stringify(data))
 						}else{
-							var data = JSON.stringify({id : 0,note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color, visible : "1"})
+							var data = JSON.stringify({id : 0, cid : attr.cid, note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color, visible : "1"})
 							$(this).parents('.note_box').attr('text_data', data)
 						}
 						scheduleAutoSave();
@@ -307,7 +307,7 @@ function runAutoSave(tid) {
 							$('.note_close').hide();
 							$(this).parents('.note_box').attr('text_data', JSON.stringify(data))
 						}else{
-							var data = JSON.stringify({id : noteId,note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color,visible:0})
+							var data = JSON.stringify({id : noteId, cid : attr.cid, note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color,visible:0})
 							$(this).parents('.draggableDiv ').addClass('note_close');
 							$('.note_close').hide();
 							$(this).parents('.note_box').attr('text_data', data)
@@ -583,6 +583,8 @@ function sanitizeSize(val, def) {
 
 // shared across all bindings so a double-click / duplicate binding can't add twice
 var lastNoteAddTime = 0;
+// monotonic client id for unsaved notes, used to reconcile server-assigned ids
+var clientNoteSeq = 0;
 
 // Create a new sticky note at (x, y) within the active board and return it.
 // Shared by double-click and the "Add New" button so any number can be added.
@@ -592,7 +594,7 @@ function addNoteAt(x, y) {
 	if (nowTs - lastNoteAddTime < 500) { console.log('[stickynotes] addNoteAt BLOCKED by guard'); return null; }
 	lastNoteAddTime = nowTs;
 	var note = {
-		id: 0, note: "", xPos: x + 'px', yPos: y + 'px',
+		id: 0, cid: 'c' + (++clientNoteSeq), note: "", xPos: x + 'px', yPos: y + 'px',
 		width: NOTE_SIZE + 'px', height: NOTE_SIZE + 'px',
 		color: "color_blue", visible: "1"
 	};
@@ -620,7 +622,7 @@ function addNoteAt(x, y) {
 			attr.note = noteText; attr.xPos = xPos + 'px'; attr.yPos = yPos + 'px'; attr.color = color;
 			$(this).find('.note_box').attr('text_data', JSON.stringify(attr));
 		} else {
-			var data = JSON.stringify({ id: 0, note: noteText, xPos: xPos + 'px', yPos: yPos + 'px', width: $(this).css('width'), height: $(this).css('height'), color: color, visible: "1" });
+			var data = JSON.stringify({ id: 0, cid: attr.cid, note: noteText, xPos: xPos + 'px', yPos: yPos + 'px', width: $(this).css('width'), height: $(this).css('height'), color: color, visible: "1" });
 			$(this).find('.note_box').attr('text_data', data);
 		}
 		scheduleAutoSave();
@@ -671,22 +673,26 @@ function autoSave(tid, opts){
 	$.post(url+tid,{data : data} , function(response){
 		console.log('[stickynotes] autoSave response:', response.status, '| created ids:', JSON.stringify(response.created));
 		if(response.status == true){
-			// adopt the DB-assigned ids for the newly created notes so the next
-			// save updates them instead of inserting duplicates
+			// adopt the DB-assigned ids for newly created notes, matching by client
+			// id (cid) in the current DOM so it's immune to ordering/re-render races
 			if(response.created && response.created.length){
-				for(var i=0; i<newBoxes.length && i<response.created.length; i++){
-					var $box = newBoxes[i];
-					var newId = response.created[i];
-					try{
-						var attr = JSON.parse($box.attr('text_data'));
-						attr.id = newId;
-						$box.attr('text_data', JSON.stringify(attr));
-					}catch(e){}
-					$box.find('.note_content textarea').attr('note_id', newId);
-					$box.find('.note_header').attr('note_header_id', newId);
-					$box.find('.close_note').attr('close_note_id', newId);
-					$box.find('.delete_note').attr('delete_note_id', newId);
-				}
+				response.created.forEach(function(item){
+					if(!item || !item.cid){ return; }
+					$('.note_box').each(function(){
+						var $box = $(this);
+						var attr;
+						try{ attr = JSON.parse($box.attr('text_data')); }catch(e){ return; }
+						if(attr.cid === item.cid && (!attr.id || attr.id == 0)){
+							attr.id = item.id;
+							$box.attr('text_data', JSON.stringify(attr));
+							$box.find('.note_content textarea').attr('note_id', item.id);
+							$box.find('.note_header').attr('note_header_id', item.id);
+							$box.find('.close_note').attr('close_note_id', item.id);
+							$box.find('.delete_note').attr('delete_note_id', item.id);
+							return false; // stop iterating once matched
+						}
+					});
+				});
 			}
 
 			$(".sidebar_drawer_box").each(function(){

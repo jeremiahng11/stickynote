@@ -103,7 +103,8 @@ router.post('/:id', async (req, res)=>{
                 if(!data.id || data.id == 0){
                     let row = pick(data);
                     row.boardId = req.params.id;
-                    newData.push(row)
+                    // keep the client id (cid) alongside; it is not a DB column
+                    newData.push({ cid: data.cid, values: row })
                 }else{
                     oldData.push({ id: data.id, values: pick(data) })
                 }
@@ -117,11 +118,12 @@ router.post('/:id', async (req, res)=>{
             // which caused the client to re-create notes -> duplicates)
             let created = [];
             for(let n=0; n<newData.length; n++){
-                const row = await Notes.create(newData[n]);
-                created.push(row.id);
+                const row = await Notes.create(newData[n].values);
+                created.push({ cid: newData[n].cid, id: row.id });
             }
 
-            // returning the new ids lets the client adopt them and avoid duplicate inserts
+            // returning {cid, id} lets the client match each new note back by its
+            // client id and adopt the real id, preventing duplicate inserts
             return res.json({status : true, message :  'Notes saved successfully!!', created : created})
         }catch(err){
             console.log('Notes save error:', err && err.stack ? err.stack : err)
