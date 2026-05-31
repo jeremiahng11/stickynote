@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-o (dump render)');
+console.log('[stickynotes] custom.js build 2026-05-31-p (removed drag.js duplicate)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -185,8 +185,6 @@ function runAutoSave(tid) {
 							} 
 
 							$(".content_inner .container-fluid .row").html(noteTemp);
-							console.log('[stickynotes] RENDER board', id, '-> got', resNotes.length, 'notes from server');
-							$('.content_inner .note_box').each(function(){ console.log('   rendered:', $(this).attr('text_data')); });
 							$(".content_inner .container-fluid .row").find('.col-xl-3').draggable({containment : "parent"}).on('dragstop', function( event, ui ) {
 								var xpos = ui.position.left;
 								var ypos = ui.position.top;
@@ -592,8 +590,7 @@ var clientNoteSeq = 0;
 // Shared by double-click and the "Add New" button so any number can be added.
 function addNoteAt(x, y) {
 	var nowTs = (new Date()).getTime();
-	console.log('[stickynotes] addNoteAt called', x, y, 'dt=' + (nowTs - lastNoteAddTime));
-	if (nowTs - lastNoteAddTime < 500) { console.log('[stickynotes] addNoteAt BLOCKED by guard'); return null; }
+	if (nowTs - lastNoteAddTime < 500) { return null; }
 	lastNoteAddTime = nowTs;
 	var note = {
 		id: 0, cid: 'c' + (++clientNoteSeq), note: "", xPos: x + 'px', yPos: y + 'px',
@@ -612,7 +609,6 @@ function addNoteAt(x, y) {
 
 	var $note = $(html).hide();
 	$note.appendTo(".content_inner .container-fluid .row").show("fade", 300);
-	console.log('[stickynotes] note appended; total notes in DOM now:', $('.content_inner .note_box').length);
 	$note.draggable({ containment: "parent" }).on('dragstop', function (e, ui) {
 		var xPos = ui.position.left;
 		var yPos = ui.position.top;
@@ -669,7 +665,6 @@ function autoSave(tid, opts){
 		try{
 			var a = JSON.parse(td);
 			if(!a.id || a.id == 0){
-				console.log('[stickynotes] id=0 note found ->', JSON.stringify(a));
 				// every unsaved note must carry a cid so the server-assigned id can
 				// be reconciled back; assign one if it's missing (e.g. leftover notes)
 				if(!a.cid){ a.cid = 'c' + (++clientNoteSeq); }
@@ -681,9 +676,7 @@ function autoSave(tid, opts){
 		arr.push(td);
 	});
 	var data = JSON.stringify(arr)
-	console.log('[stickynotes] autoSave -> board', tid, '| total notes:', arr.length, '| new (id=0):', newBoxes.length);
 	$.post(url+tid,{data : data} , function(response){
-		console.log('[stickynotes] autoSave response:', response.status, '| created ids:', JSON.stringify(response.created));
 		if(response.status == true){
 			// adopt the DB-assigned ids for newly created notes, matching by client
 			// id (cid) in the current DOM so it's immune to ordering/re-render races

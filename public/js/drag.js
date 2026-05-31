@@ -59,96 +59,10 @@
     };
 })(jQuery);
 
-var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute;left:#XPOS#px;top:#YPOS#px;z-index:#ZINDEX#">'
-                +	'<div class="note_box" text_data={"id":0,"note":"","xPos":"#XPOS#px","yPos":"#YPOS#px","color":"color_blue","visible":"1"}>'
-                +		'<div class="note_header">'
-                +			'<span>'
-                +				'<a class="color_options" href="javascript:void(0);">'
-                +					'<i class="fas fa-palette"></i>'
-                +				'</a>'
-                +			'</span>'
-                +			'<span>'
-                +				'<a class="close_note" href="javascript:void(0);">'
-                +					'<i class="fas fa-minus"></i>'
-                +				'</a>'
-                +				'<a class="delete_note" href="javascript:void(0);">'
-                +					'<i class="far fa-trash-alt"></i>'
-                +				'</a>'
-                +			'</span>'
-                +			'<div class="color_options_box">'
-                +				'<span class="color_pink"></span>'
-                +				'<span class="color_blue"></span>'
-                +				'<span class="color_orange"></span>'
-                +				'<span class="color_brown"></span>'
-                +           '</div>'
-                +		'</div>'
-                +		'<div class="note_content">'
-                +			'<textarea data_color="color_blue"></textarea>'
-                +		'</div>'
-                +	'</div>'
-                +'</div>';
-
-function deleteNote(){
-    $(this).parent('.draggableDiv').hide("puff",{ percent: 133}, 250);
-};
-
-function newNote() {
-    let xPos = randomNumber(10,100);
-    let yPos = randomNumber(10,100);
-
-    noteTemp1 = noteTemp.replace(/#XPOS#/g,xPos)
-    noteTemp1 = noteTemp1.replace(/#YPOS#/g,yPos)
-    noteTemp1 = noteTemp1.replace("#ZINDEX#",1)
-    
-    $('.draggableDiv').css('z-index','0');
-    
-    $(noteTemp1).hide().appendTo(".content_inner .container-fluid .row").show("fade", 300).draggable({containment : "parent"});
-    $(".content_inner .container-fluid .row").find('.col-xl-3').draggable({containment : "parent"}).on('dragstop',function( e,ui){ 
-        var xPos = ui.position.left; 
-        var yPos = ui.position.top;
-        var color = $(this).find('.note_content textarea').attr('data_color')
-        var note = $(this).find('.note_content textarea').val();
-        var attr = JSON.parse($(this).find('.note_box').attr('text_data'))
-                    
-        if(attr.id != 0){
-            let data = attr
-            data.note = note
-            data.xPos = xPos+'px'
-            data.yPos = yPos+'px'
-            data.color = color
-            $(this).find('.note_box').attr('text_data', JSON.stringify(data))
-        }else{ 
-            var data = JSON.stringify({id : 0, note:note, xPos : xPos+'px', yPos : yPos+'px', color : color})
-            $(this).find('.note_box').attr('text_data', data)
-        }
-        $('.draggableDiv').css('z-index','0');
-		$(this).zIndex(1);
-    });
-
- 	$('.delete_note').click(deleteNote);
-	$('textarea').autogrow();
-	
-    $('.draggableDiv');
-	return false; 
-};
-
-
-
+// Give the board area enough height to drag notes around in.
+// NOTE: the old note-creation code that used to live here (its own newNote()
+// and ".add_note_box" click handler) was removed — it duplicated custom.js and
+// created a second, old-format note on every "Add" click.
 $(document).ready(function() {
-    
     $(".content_inner .container-fluid .row").height($(document).height());
-    
-    $(".add_note_box").click(function(){
-        newNote();
-    });
-
-    $('.delete_note').click();
-	  
-    return false;
 });
-
-function randomNumber(min, max) {  
-    min = Math.ceil(min); 
-    max = Math.floor(max); 
-    return Math.floor(Math.random() * (max - min + 1)) + min; 
-}
