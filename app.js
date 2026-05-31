@@ -139,12 +139,33 @@ async function cleanupBadNotes() {
     }
 }
 
+// Collapse duplicate notes left over from the earlier id-reconciliation bug.
+// Two notes that share the same board, text, position, size and colour are
+// duplicates; keep the lowest id and delete the rest. Safe + idempotent
+// (distinct notes never share an exact pixel position and identical text).
+async function dedupeNotes() {
+    try {
+        const [result] = await con.query(
+            'DELETE n1 FROM sn_notes n1 ' +
+            'JOIN sn_notes n2 ON n1.boardId = n2.boardId ' +
+            'AND n1.note <=> n2.note AND n1.xPos <=> n2.xPos AND n1.yPos <=> n2.yPos ' +
+            'AND n1.width <=> n2.width AND n1.height <=> n2.height AND n1.color <=> n2.color ' +
+            'AND n1.id > n2.id'
+        );
+        const removed = (result && (result.affectedRows || 0)) || 0;
+        if (removed) { console.log('Removed ' + removed + ' duplicate note row(s)'); }
+    } catch (err) {
+        console.log('Could not dedupe notes: ' + err.message);
+    }
+}
+
 async function start() {
     try {
         await con.connectWithRetry();
         await con.sync();
         await ensureNoteSizeColumns();
         await cleanupBadNotes();
+        await dedupeNotes();
         console.log('Database synced');
 
         app.listen(port, hostname, function () {
