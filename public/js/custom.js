@@ -167,12 +167,12 @@ function runAutoSave(tid) {
 							for (var i = 0; i < resNotes.length; i++) {
 								if(resNotes[i].visible == 1){ 
 									if(resNotes[i].note == null){   
-										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
+										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+attrEscape(JSON.stringify(resNotes[i]))+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
 									}else{
-										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap"  text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
+										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap"  text_data=\''+attrEscape(JSON.stringify(resNotes[i]))+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
 									}	
 								}else{
-									noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv note_close" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
+									noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv note_close" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||(NOTE_SIZE+'px'))+'; height: '+(resNotes[i].height||(NOTE_SIZE+'px'))+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+attrEscape(JSON.stringify(resNotes[i]))+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
 									$('.see_notes').css('opacity','');
 									$('.see_notes').css('pointer-events','inherit');
 								}
@@ -210,7 +210,7 @@ function runAutoSave(tid) {
 							var y = e.pageY - elm.position().top;
 							
 							var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:'+x+'px; top:'+y+'px; width:'+NOTE_SIZE+'px; height:'+NOTE_SIZE+'px;">'
-										+	'<div class="note_box" text_data={"id":0,"note":"","xPos":"'+x+'px","yPos":"'+y+'px","width":"'+NOTE_SIZE+'px","height":"'+NOTE_SIZE+'px","color":"color_blue","visible":"1"}>'
+										+	'<div class="note_box" text_data=\''+attrEscape(JSON.stringify({id:0,note:"",xPos:x+'px',yPos:y+'px',width:NOTE_SIZE+'px',height:NOTE_SIZE+'px',color:"color_blue",visible:"1"}))+'\'>'
 										+		'<div class="note_header">'
 										+			'<span>'
 										+				'<a class="color_options" href="javascript:void(0);">'
@@ -600,6 +600,18 @@ function makeNoteResizable($cols) {
 			}
 		});
 	});
+}
+
+// Escape a string for safe embedding inside an HTML attribute. Escaping '&'
+// first is essential: note text is stored with entities like &quot;, and without
+// this the browser would decode them back into raw quotes and corrupt the JSON.
+function attrEscape(str) {
+	return String(str)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
 }
 
 function htmlEntities(str) {

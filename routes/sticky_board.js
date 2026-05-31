@@ -91,7 +91,14 @@ router.post('/:id', async (req, res)=>{
                 return out;
             };
             for(let i=0; i<arr.length; i++){
-                let data = JSON.parse(arr[i])
+                let data;
+                try{
+                    data = JSON.parse(arr[i])
+                }catch(e){
+                    // skip a single malformed note rather than failing the whole board
+                    console.log('Skipping malformed note payload:', e.message)
+                    continue;
+                }
                 // treat missing / 0 / null id as a brand new note
                 if(!data.id || data.id == 0){
                     let row = pick(data);
