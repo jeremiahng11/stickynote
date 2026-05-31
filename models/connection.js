@@ -3,9 +3,7 @@ const config = require('../config/db');
 
 const db = config.data;
 
-const con = new Sequelize(db.database, db.username, db.password, {
-    host: db.host,
-    port: db.port,
+const dialectOptions = {
     dialect: 'mysql',
     logging: false,
     pool: {
@@ -14,7 +12,17 @@ const con = new Sequelize(db.database, db.username, db.password, {
         acquire: 30000,
         idle: 10000,
     },
-});
+};
+
+// Prefer a single connection URL (e.g. the one Coolify provides) when present;
+// otherwise fall back to the discrete DB_* variables.
+const con = process.env.DATABASE_URL
+    ? new Sequelize(process.env.DATABASE_URL, dialectOptions)
+    : new Sequelize(db.database, db.username, db.password, {
+          host: db.host,
+          port: db.port,
+          ...dialectOptions,
+      });
 
 // Retry the initial connection so the app can start before the DB is ready
 // (common in container orchestration like Coolify / docker-compose).
