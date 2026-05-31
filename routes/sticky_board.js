@@ -83,19 +83,27 @@ router.post('/:id', async (req, res)=>{
             var arr = JSON.parse(req.body.data)
             var newData = [];
             var oldData = [];
+            // only these columns exist on the notes table; ignore anything else
+            const allowed = ['note','color','xPos','yPos','width','height','visible','boardId'];
+            const pick = (src)=>{
+                const out = {};
+                allowed.forEach((k)=>{ if(typeof src[k] !== 'undefined'){ out[k] = src[k]; } });
+                return out;
+            };
             for(let i=0; i<arr.length; i++){
                 let data = JSON.parse(arr[i])
-                if(data.id == 0){
-                    delete data.id;            // let the DB assign the primary key
-                    data.boardId = req.params.id;
-                    newData.push(data)
+                // treat missing / 0 / null id as a brand new note
+                if(!data.id || data.id == 0){
+                    let row = pick(data);
+                    row.boardId = req.params.id;
+                    newData.push(row)
                 }else{
-                    oldData.push(data)
+                    oldData.push({ id: data.id, values: pick(data) })
                 }
             }
 
             // update existing notes (await so the response reflects the real result)
-            await Promise.all(oldData.map((data)=> Notes.update(data,{where : {id : data.id}})));
+            await Promise.all(oldData.map((o)=> Notes.update(o.values,{where : {id : o.id}})));
 
             // create new notes and capture their generated ids (in submission order)
             let created = [];
@@ -106,8 +114,8 @@ router.post('/:id', async (req, res)=>{
             // returning the new ids lets the client adopt them and avoid duplicate inserts
             return res.json({status : true, message :  'Notes saved successfully!!', created : created.map((c)=> c.id)})
         }catch(err){
-            console.log("Error :"+err)
-            return res.json({status : false, message : 'Notes not saved.'})
+            console.log('Notes save error:', err && err.stack ? err.stack : err)
+            return res.json({status : false, message : 'Notes not saved.', error : (err && err.message) ? err.message : String(err)})
         }
     }
 });

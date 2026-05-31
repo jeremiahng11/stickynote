@@ -655,7 +655,7 @@ function autoSave(tid, opts){
 				isValid('ok', response.message);
 			}
 		}else{
-			isValid('error', response.message);
+			isValid('error', response.message + (response.error ? ' ('+response.error+')' : ''));
 		}
 	}).always(function(){
 		if(typeof opts.done === 'function'){ opts.done(); }
