@@ -203,65 +203,29 @@ function runAutoSave(tid) {
 						});
 					});
 
+					function boardIsActive(){
+						return $('.sidebar_drawer').find('.sidebar_drawer_box').hasClass('active_note');
+					}
+
+					// double-click the board to drop a note where you click
 					$(document).on("dblclick",".content_inner", function(e){
-						if(($('.sidebar_drawer').find('.sidebar_drawer_box').hasClass('active_note'))== true){
-
-							var elm = $(this); 
-							var x = e.pageX - elm.position().left; 
+						if(boardIsActive()){
+							var elm = $(this);
+							var x = e.pageX - elm.position().left;
 							var y = e.pageY - elm.position().top;
-							
-							var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:'+x+'px; top:'+y+'px; width:'+NOTE_SIZE+'px; height:'+NOTE_SIZE+'px;">'
-										+	'<div class="note_box" text_data=\''+attrEscape(JSON.stringify({id:0,note:"",xPos:x+'px',yPos:y+'px',width:NOTE_SIZE+'px',height:NOTE_SIZE+'px',color:"color_blue",visible:"1"}))+'\'>'
-										+		'<div class="note_header">'
-										+			'<span>'
-										+				'<a class="color_options" href="javascript:void(0);">'
-										+					'<i class="fas fa-palette"></i>'
-										+				'</a>'
-										+			'</span>'
-										+			'<span>'
-										+				'<a class="close_note" href="javascript:void(0);">'
-										+					'<i class="fas fa-minus"></i>'
-										+				'</a>'
-										+				'<a class="delete_note" href="javascript:void(0);">'
-										+					'<i class="far fa-trash-alt"></i>'
-										+				'</a>'
-										+			'</span>'
-										+			'<div class="color_options_box">'
-										+				'<span class="color_pink"></span>'
-										+				'<span class="color_blue"></span>'
-										+				'<span class="color_orange"></span>'
-										+				'<span class="color_brown"></span>'
-										+           '</div>'
-										+		'</div>'
-										+		'<div class="note_content">'
-										+			'<textarea data_color="color_blue"></textarea>'
-										+		'</div>'
-										+	'</div>'
-										+'</div>';
+							addNoteAt(x, y);
+						}
+					});
 
-							$(noteTemp).hide().appendTo(".content_inner .container-fluid .row").show("fade", 300).draggable({containment : "parent"});
-							$(".content_inner .container-fluid .row").find('.col-xl-3').draggable({containment : "parent"}).on('dragstop',function( e,ui){
-								var xPos = ui.position.left;
-								var yPos = ui.position.top;
-								var color = $(this).find('.note_content textarea').attr('data_color')
-								var noteData = $(this).find('.note_content textarea').val();
-								var note = htmlEntities(noteData)
-								var attr = JSON.parse($(this).find('.note_box').attr('text_data'))
-
-								if(attr.id != 0){
-									let data = attr
-									data.note = note
-									data.xPos = xPos+'px'
-									data.yPos = yPos+'px'
-									data.color = color
-									$(this).find('.note_box').attr('text_data', JSON.stringify(data))
-								}else{
-									var data = JSON.stringify({id : 0, note:note, xPos : xPos+'px', yPos : yPos+'px', width : $(this).css('width'), height : $(this).css('height'), color : color, visible : "1"})
-									$(this).find('.note_box').attr('text_data', data)
-								}
-								scheduleAutoSave();
-							});
-							makeNoteResizable($(".content_inner .container-fluid .row").find('.col-xl-3'));
+					// "Add New" button: drop a note at a staggered position so many
+					// notes don't stack exactly on top of each other
+					$(document).on("click",".add_note_box", function(){
+						if(boardIsActive()){
+							var count = $('.content_inner .note_box').length;
+							var offset = (count % 8) * 28;
+							addNoteAt(40 + offset, 40 + offset);
+						}else{
+							isValid('error', 'Select or create a board first.');
 						}
 					});
 
@@ -601,6 +565,49 @@ function makeNoteResizable($cols) {
 			}
 		});
 	});
+}
+
+// Create a new sticky note at (x, y) within the active board and return it.
+// Shared by double-click and the "Add New" button so any number can be added.
+function addNoteAt(x, y) {
+	var note = {
+		id: 0, note: "", xPos: x + 'px', yPos: y + 'px',
+		width: NOTE_SIZE + 'px', height: NOTE_SIZE + 'px',
+		color: "color_blue", visible: "1"
+	};
+	var html = '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:' + x + 'px; top:' + y + 'px; width:' + NOTE_SIZE + 'px; height:' + NOTE_SIZE + 'px;">'
+		+ '<div class="note_box" text_data=\'' + attrEscape(JSON.stringify(note)) + '\'>'
+		+ '<div class="note_header">'
+		+ '<span><a class="color_options" href="javascript:void(0);"><i class="fas fa-palette"></i></a></span>'
+		+ '<span><a class="close_note" href="javascript:void(0);"><i class="fas fa-minus"></i></a><a class="delete_note" href="javascript:void(0);"><i class="far fa-trash-alt"></i></a></span>'
+		+ '<div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div>'
+		+ '</div>'
+		+ '<div class="note_content"><textarea data_color="color_blue"></textarea></div>'
+		+ '</div></div>';
+
+	var $note = $(html).hide();
+	$note.appendTo(".content_inner .container-fluid .row").show("fade", 300);
+	$note.draggable({ containment: "parent" }).on('dragstop', function (e, ui) {
+		var xPos = ui.position.left;
+		var yPos = ui.position.top;
+		var color = $(this).find('.note_content textarea').attr('data_color');
+		var noteData = $(this).find('.note_content textarea').val();
+		var noteText = htmlEntities(noteData);
+		var attr = JSON.parse($(this).find('.note_box').attr('text_data'));
+		if (attr.id != 0) {
+			attr.note = noteText; attr.xPos = xPos + 'px'; attr.yPos = yPos + 'px'; attr.color = color;
+			$(this).find('.note_box').attr('text_data', JSON.stringify(attr));
+		} else {
+			var data = JSON.stringify({ id: 0, note: noteText, xPos: xPos + 'px', yPos: yPos + 'px', width: $(this).css('width'), height: $(this).css('height'), color: color, visible: "1" });
+			$(this).find('.note_box').attr('text_data', data);
+		}
+		scheduleAutoSave();
+	});
+	makeNoteResizable($note);
+	$note.find('textarea').focus();
+	// persist the new note right away so it survives a reload even before editing
+	scheduleAutoSave();
+	return $note;
 }
 
 // Escape a string for safe embedding inside an HTML attribute. Escaping '&'
