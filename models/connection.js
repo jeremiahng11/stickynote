@@ -3,6 +3,10 @@ const config = require('../config/db');
 
 const db = config.data;
 
+// Enable TLS when the server requires secure transport (set DB_SSL=true).
+// rejectUnauthorized is off because managed DBs (Coolify) use self-signed certs.
+const useSsl = process.env.DB_SSL === 'true';
+
 const dialectOptions = {
     dialect: 'mysql',
     logging: false,
@@ -12,6 +16,9 @@ const dialectOptions = {
         acquire: 30000,
         idle: 10000,
     },
+    ...(useSsl
+        ? { dialectOptions: { ssl: { rejectUnauthorized: false } } }
+        : {}),
 };
 
 // Prefer a single connection URL (e.g. the one Coolify provides) when present;
