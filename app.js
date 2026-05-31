@@ -94,10 +94,30 @@ app.use(function (err, req, res, next) {
     res.status(500).send('Internal Server Error');
 });
 
+// Add the width/height columns to an existing sn_notes table if missing.
+// sync() only creates missing tables, not missing columns, so we do it safely
+// here (idempotent, leaves foreign keys untouched).
+async function ensureNoteSizeColumns() {
+    const { STRING } = require('sequelize');
+    const qi = con.getQueryInterface();
+    try {
+        const desc = await qi.describeTable('sn_notes');
+        if (!desc.width) {
+            await qi.addColumn('sn_notes', 'width', { type: STRING, allowNull: true });
+        }
+        if (!desc.height) {
+            await qi.addColumn('sn_notes', 'height', { type: STRING, allowNull: true });
+        }
+    } catch (err) {
+        console.log('Could not ensure note size columns: ' + err.message);
+    }
+}
+
 async function start() {
     try {
         await con.connectWithRetry();
         await con.sync();
+        await ensureNoteSizeColumns();
         console.log('Database synced');
 
         app.listen(port, hostname, function () {

@@ -930,5 +930,40 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 @media (max-width: 575.98px) {
-	
+
+}
+
+/********************************************************
+    Resizable Sticky Notes
+********************************************************/
+/* Free the note from Bootstrap's column width cap so it can be resized freely */
+.content_inner .draggableDiv {
+    max-width: none !important;
+    flex: none !important;
+    box-sizing: border-box;
+}
+/* The note fills its (resizable) container and stacks header over content */
+.content_inner .draggableDiv .note_box {
+    height: 100%;
+    flex-direction: column;
+}
+.content_inner .draggableDiv .note_content {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+/* Let the textarea grow/shrink with the note instead of a fixed height */
+.content_inner .draggableDiv .note_content textarea {
+    height: 100%;
+    min-height: 80px;
+}
+/* Keep jQuery UI's resize handles clickable above the note surface */
+.content_inner .draggableDiv .ui-resizable-handle {
+    z-index: 90;
+}
+.content_inner .draggableDiv .ui-resizable-se {
+    width: 14px;
+    height: 14px;
+    right: 3px;
+    bottom: 3px;
+    background-position: -64px -224px;
 }

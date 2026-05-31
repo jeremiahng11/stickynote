@@ -63,7 +63,7 @@ router.post('/', (req, res)=>{
 
 router.get('/:id', (req, res)=>{ 
     //findAll Notes 
-    Notes.findAll({attributes:["id","note","xPos","yPos","color","boardId","visible"],where : {boardId : req.params.id}}).then((notes)=>{  
+    Notes.findAll({attributes:["id","note","xPos","yPos","width","height","color","boardId","visible"],where : {boardId : req.params.id}}).then((notes)=>{
         res.json({status : true, notesData : notes})
     }).catch(errorHandler);
 });

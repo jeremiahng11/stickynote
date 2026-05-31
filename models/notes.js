@@ -15,7 +15,15 @@ const notes = con.define('sn_notes',{
     },
     yPos : {
         type : sequelize.STRING,
-        allowNull : false 
+        allowNull : false
+    },
+    width : {
+        type : sequelize.STRING,
+        allowNull : true
+    },
+    height : {
+        type : sequelize.STRING,
+        allowNull : true
     },
     visible : {
         type : sequelize.STRING,

@@ -135,12 +135,12 @@
 							for (var i = 0; i < resNotes.length; i++) {
 								if(resNotes[i].visible == 1){ 
 									if(resNotes[i].note == null){   
-										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
+										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||'260px')+'; height: '+(resNotes[i].height||'260px')+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'"></textarea></div></div></div>';
 									}else{
-										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+';"><div class="note_box '+resNotes[i].color+'_wrap"  text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
+										noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||'260px')+'; height: '+(resNotes[i].height||'260px')+';"><div class="note_box '+resNotes[i].color+'_wrap"  text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
 									}	
 								}else{
-									noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv note_close" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
+									noteTemp += '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv note_close" style="position: absolute; left: '+resNotes[i].xPos+'; top: '+resNotes[i].yPos+'; width: '+(resNotes[i].width||'260px')+'; height: '+(resNotes[i].height||'260px')+';"><div class="note_box '+resNotes[i].color+'_wrap" text_data=\''+JSON.stringify(resNotes[i])+'\'><div class="note_header"  note_header_id="'+resNotes[i].id+'"><span><a class="color_options" href="javascript:;"><i class="fas fa-palette"></i></a></span><span><a class="close_note" close_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="fas fa-minus"></i></a><a class="delete_note" delete_note_id="'+resNotes[i].id+'" href="javascript:;"><i class="far fa-trash-alt"></i></a></span><div class="color_options_box"><span class="color_pink"></span><span class="color_blue"></span><span class="color_orange"></span><span class="color_brown"></span></div></div><div class="note_content"><textarea note_id="'+resNotes[i].id+'" data_color="'+resNotes[i].color+'">'+entities(resNotes[i].note)+'</textarea></div></div></div>';
 									$('.see_notes').css('opacity','');
 									$('.see_notes').css('pointer-events','inherit');
 								}
@@ -165,19 +165,20 @@
 								}
 								
 							});
+							makeNoteResizable($(".content_inner .container-fluid .row").find('.col-xl-3'));
 							$('.note_close').hide();
-						});		
-					});	
+						});
+					});
 
-					$(document).on("dblclick",".content_inner", function(e){	
+					$(document).on("dblclick",".content_inner", function(e){
 						if(($('.sidebar_drawer').find('.sidebar_drawer_box').hasClass('active_note'))== true){
 
 							var elm = $(this); 
 							var x = e.pageX - elm.position().left; 
 							var y = e.pageY - elm.position().top;
 							
-							var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:'+x+'px; top:'+y+'px">'
-										+	'<div class="note_box" text_data={"id":0,"note":"","xPos":"'+x+'px","yPos":"'+y+'px","color":"color_blue","visible":"1"}>'
+							var noteTemp =  '<div class="col-xl-3 col-lg-6 col-md-6 colsm-12 col-12 draggableDiv" style="position:absolute; left:'+x+'px; top:'+y+'px; width:260px; height:260px;">'
+										+	'<div class="note_box" text_data={"id":0,"note":"","xPos":"'+x+'px","yPos":"'+y+'px","width":"260px","height":"260px","color":"color_blue","visible":"1"}>'
 										+		'<div class="note_header">'
 										+			'<span>'
 										+				'<a class="color_options" href="javascript:void(0);">'
@@ -206,14 +207,14 @@
 										+'</div>';
 
 							$(noteTemp).hide().appendTo(".content_inner .container-fluid .row").show("fade", 300).draggable({containment : "parent"});
-							$(".content_inner .container-fluid .row").find('.col-xl-3').draggable({containment : "parent"}).on('dragstop',function( e,ui){ 
-								var xPos = ui.position.left; 
+							$(".content_inner .container-fluid .row").find('.col-xl-3').draggable({containment : "parent"}).on('dragstop',function( e,ui){
+								var xPos = ui.position.left;
 								var yPos = ui.position.top;
 								var color = $(this).find('.note_content textarea').attr('data_color')
 								var noteData = $(this).find('.note_content textarea').val();
 								var note = htmlEntities(noteData)
 								var attr = JSON.parse($(this).find('.note_box').attr('text_data'))
-									
+
 								if(attr.id != 0){
 									let data = attr
 									data.note = note
@@ -221,11 +222,12 @@
 									data.yPos = yPos+'px'
 									data.color = color
 									$(this).find('.note_box').attr('text_data', JSON.stringify(data))
-								}else{ 
-									var data = JSON.stringify({id : 0, note:note, xPos : xPos+'px', yPos : yPos+'px', color : color})
+								}else{
+									var data = JSON.stringify({id : 0, note:note, xPos : xPos+'px', yPos : yPos+'px', width : $(this).css('width'), height : $(this).css('height'), color : color, visible : "1"})
 									$(this).find('.note_box').attr('text_data', data)
 								}
 							});
+							makeNoteResizable($(".content_inner .container-fluid .row").find('.col-xl-3'));
 						}
 					});
 
@@ -252,9 +254,9 @@
 							data.note = note 
 							$(this).parents('.note_box').attr('text_data', JSON.stringify(data))
 						}else{
-							var data = JSON.stringify({id : 0,note : note, xPos : xPos, yPos : yPos, color : color})
+							var data = JSON.stringify({id : 0,note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color, visible : "1"})
 							$(this).parents('.note_box').attr('text_data', data)
-						}	
+						}
 					});
 
 					$(document).on('click','.color_options_box span',function(){
@@ -304,7 +306,7 @@
 							$('.note_close').hide();
 							$(this).parents('.note_box').attr('text_data', JSON.stringify(data))
 						}else{
-							var data = JSON.stringify({id : noteId,note : note, xPos : xPos, yPos : yPos, color : color,visible:0})
+							var data = JSON.stringify({id : noteId,note : note, xPos : xPos, yPos : yPos, width : $(this).parents('.col-xl-3').css('width'), height : $(this).parents('.col-xl-3').css('height'), color : color,visible:0})
 							$(this).parents('.draggableDiv ').addClass('note_close');
 							$('.note_close').hide();
 							$(this).parents('.note_box').attr('text_data', data)
@@ -536,6 +538,30 @@ $('#note_success').click(function(){
 $('#note_error').click(function(){
 	isValid('#send');
 });
+
+/*-----------------------------------------------------
+	Make sticky notes resizable by dragging any edge/corner
+-----------------------------------------------------*/
+function makeNoteResizable($cols) {
+	$cols.each(function () {
+		var $col = $(this);
+		if ($col.data('resizable-init')) { return; }
+		$col.data('resizable-init', true);
+		$col.resizable({
+			handles: "n, e, s, w, ne, se, sw, nw",
+			minWidth: 150,
+			minHeight: 120,
+			stop: function (event, ui) {
+				var $box = $(this).find('.note_box');
+				if (!$box.attr('text_data')) { return; }
+				var attr = JSON.parse($box.attr('text_data'));
+				attr.width = Math.round(ui.size.width) + 'px';
+				attr.height = Math.round(ui.size.height) + 'px';
+				$box.attr('text_data', JSON.stringify(attr));
+			}
+		});
+	});
+}
 
 function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&eq;');
