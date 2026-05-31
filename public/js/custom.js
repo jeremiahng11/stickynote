@@ -4,7 +4,7 @@
 -------------------------------------------------------------------*/
 
 // Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-k (cid reconcile)');
+console.log('[stickynotes] custom.js build 2026-05-31-l (cid for all new notes)');
 
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
@@ -663,10 +663,19 @@ function autoSave(tid, opts){
 
 	$('.note_box').each(function(){
 		var td = $(this).attr('text_data');
-		if(td != null){
-			arr.push(td);
-			try{ if(JSON.parse(td).id == 0){ newBoxes.push($(this)); } }catch(e){}
-		}
+		if(td == null){ return; }
+		try{
+			var a = JSON.parse(td);
+			if(!a.id || a.id == 0){
+				// every unsaved note must carry a cid so the server-assigned id can
+				// be reconciled back; assign one if it's missing (e.g. leftover notes)
+				if(!a.cid){ a.cid = 'c' + (++clientNoteSeq); }
+				td = JSON.stringify(a);
+				$(this).attr('text_data', td);
+				newBoxes.push($(this));
+			}
+		}catch(e){}
+		arr.push(td);
 	});
 	var data = JSON.stringify(arr)
 	console.log('[stickynotes] autoSave -> board', tid, '| total notes:', arr.length, '| new (id=0):', newBoxes.length);
