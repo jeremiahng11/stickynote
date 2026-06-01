@@ -12,6 +12,29 @@ const errorHandler = (err, res) =>{
     console.log("Error :"+err)
 }
 
+// Require an authenticated session for API routes (returns 401 JSON).
+const requireAuth = (req, res, next) =>{
+    if(!req.session || !req.session.Id){
+        return res.status(401).json({status : false, message : 'Not authenticated.'})
+    }
+    next();
+}
+
+// Load the board for :id and confirm it belongs to the logged-in user.
+// Prevents one user from reading/modifying another user's board (IDOR).
+const loadOwnedBoard = (req, res, next) =>{
+    board.findOne({where : {id : req.params.id, userId : req.session.Id}}).then((found)=>{
+        if(!found){
+            return res.status(403).json({status : false, message : 'Board not found or not yours.'})
+        }
+        req.board = found;
+        next();
+    }).catch((err)=>{
+        console.log("Error :"+err)
+        res.status(500).json({status : false, message : 'Server error.'})
+    });
+}
+
 router.get('/', (req, res)=>{
     if(req.session.Id){
         //Here you will find user who loggedIn
@@ -38,7 +61,7 @@ router.get('/', (req, res)=>{
     }
 });
 
-router.post('/', (req, res)=>{
+router.post('/', requireAuth, (req, res)=>{
     var title = req.body.title
     var userId = req.session.Id
     if(title==''){
@@ -62,18 +85,20 @@ router.post('/', (req, res)=>{
     }
 });
 
-router.get('/:id', (req, res)=>{ 
-    //findAll Notes 
+router.get('/:id', requireAuth, loadOwnedBoard, (req, res)=>{
+    //findAll Notes
     Notes.findAll({attributes:["id","note","xPos","yPos","width","height","color","boardId","visible"],where : {boardId : req.params.id, id : {[Op.gt] : 0}}}).then((notes)=>{
         res.json({status : true, notesData : notes})
     }).catch(errorHandler);
 });
 
-router.post('/:id', async (req, res)=>{
+router.post('/:id', requireAuth, loadOwnedBoard, async (req, res)=>{
     if(req.body.id){
          //for delete notes
         try{
-            await Notes.destroy({where : {id : req.body.id}});
+            // scope the delete to this (owned) board so a note id from another
+            // board can't be deleted
+            await Notes.destroy({where : {id : req.body.id, boardId : req.params.id}});
             return res.json({status : true, message : 'Note deleted successfully!!'})
         }catch(err){
             console.log("Error :"+err)
@@ -111,8 +136,9 @@ router.post('/:id', async (req, res)=>{
                 }
             }
 
-            // update existing notes (await so the response reflects the real result)
-            await Promise.all(oldData.map((o)=> Notes.update(o.values,{where : {id : o.id}})));
+            // update existing notes, scoped to this board so a forged id from
+            // another board can't be modified
+            await Promise.all(oldData.map((o)=> Notes.update(o.values,{where : {id : o.id, boardId : req.params.id}})));
 
             // create new notes one by one so we reliably get each generated id
             // (bulkCreate does not return autoincrement ids on all MySQL setups,
@@ -133,11 +159,17 @@ router.post('/:id', async (req, res)=>{
     }
 });
 
-router.post('/boardDelete/:id',(req, res)=>{ 
-    //for delete a board 
-    board.destroy({where : {id : req.params.id}}).then((result)=>{                            
+router.post('/boardDelete/:id', requireAuth, (req, res)=>{
+    // only the owner can delete their board (cascades to its notes)
+    board.destroy({where : {id : req.params.id, userId : req.session.Id}}).then((count)=>{
+        if(!count){
+            return res.status(403).json({status: false, message : 'Board not found or not yours.'})
+        }
         res.json({status: true, message : 'board deleted.'})
-    }).catch(errorHandler);
+    }).catch((err)=>{
+        console.log("Error :"+err)
+        res.status(500).json({status: false, message : 'Board not deleted.'})
+    });
 });
 
 module.exports = router

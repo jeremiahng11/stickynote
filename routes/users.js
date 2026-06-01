@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const router = express.Router();
 
 //require models
@@ -8,6 +9,11 @@ const sendMail = require('../config/mailapi');
 
 // Registration toggle: SIGNUP=1 (or unset) enables sign up, SIGNUP=0 disables it.
 const signupEnabled = (process.env.SIGNUP || '1') !== '0';
+
+// bcrypt work factor (10–12 recommended)
+const SALT_ROUNDS = 12;
+// how long a password-reset link stays valid
+const RESET_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 //errorHandler Function
 const errorHandler = (err, res) =>{
@@ -34,8 +40,8 @@ router.post('/login-register',(req, res)=>{
                   if(result){
                         res.json({status : false, message:'User already exists...Try another Email address!!'}) 
                   }else{
-                        //bcrypt used for encrypt password 
-                        bcrypt.hash(password,8, (err, hash)=>{
+                        //bcrypt used for encrypt password
+                        bcrypt.hash(password,SALT_ROUNDS, (err, hash)=>{
                               //create users
                               Users.create({
                                     email: email,
@@ -69,30 +75,60 @@ router.get('/forgot-password',(req, res)=>{
       res.render('forgot-password')
 });
 
-router.post('/forgot-password',(req, res)=>{ 
-      var email =  req.body.email
-      var newPassword = req.body.newPassword
-      Users.findOne({where :{email : email}}).then((result)=>{
-            if(result){
-                  bcrypt.hash(newPassword, 8, async(err, hash)=>{
-                        let m =  await sendMail(email,newPassword);
-                        if(m.messageId){
-                              Users.update({password:hash},{where:{email: result.email}}).then((updateData)=>{
-                                    res.json({status : true, message : 'Please check your mail inbox!'})
-                              }).catch((err)=>{
-                                    res.json({status : false, message:'Password not updated', error : err})
-                              });
-                        }else{
-                              res.json({status : false, message : 'We are not able to send email now, please try after sometime!'})
-                        }
-
-                  });
-            }else{
-                  res.json({status : false, message:'Email not exists!!'})
+// Step 1: request a reset. Emails a one-time link to the account owner.
+// Always responds generically so attackers can't probe which emails exist.
+router.post('/forgot-password', async (req, res)=>{
+      const generic = { status : true, message : 'If that email is registered, a reset link has been sent.' };
+      try{
+            const email = (req.body.email || '').trim();
+            if(!email){ return res.json({status : false, message : 'Email is required.'}); }
+            const user = await Users.findOne({where : {email : email}});
+            if(user){
+                  const token = crypto.randomBytes(32).toString('hex');
+                  const expires = Date.now() + RESET_TTL_MS;
+                  await Users.update({resetToken : token, resetExpires : expires}, {where : {id : user.id}});
+                  const baseUrl = process.env.BASE_URL || (req.protocol + '://' + req.get('host'));
+                  const link = baseUrl + '/reset-password?token=' + token;
+                  try{ await sendMail(email, link); }
+                  catch(mailErr){ console.log('Reset email failed:', mailErr.message); }
             }
-      }).catch((err)=>{
-            res.json({status : false, message:'Email not exists!!', error : err})
-      });
+            return res.json(generic);
+      }catch(err){
+            console.log('forgot-password error:', err.message);
+            return res.json({status : false, message : 'Something went wrong, please try again.'});
+      }
+});
+
+// Step 2: show the reset form if the token is valid.
+router.get('/reset-password', async (req, res)=>{
+      const token = req.query.token || '';
+      let valid = false;
+      try{
+            const user = token ? await Users.findOne({where : {resetToken : token}}) : null;
+            valid = !!(user && user.resetExpires && Number(user.resetExpires) > Date.now());
+      }catch(err){ console.log('reset-password view error:', err.message); }
+      res.render('reset-password', { token : token, valid : valid });
+});
+
+// Step 3: set the new password if the token is still valid, then invalidate it.
+router.post('/reset-password', async (req, res)=>{
+      try{
+            const token = req.body.token || '';
+            const password = req.body.password || '';
+            if(password.length < 6){
+                  return res.json({status : false, message : 'Password must be at least 6 characters.'});
+            }
+            const user = token ? await Users.findOne({where : {resetToken : token}}) : null;
+            if(!user || !user.resetExpires || Number(user.resetExpires) < Date.now()){
+                  return res.json({status : false, message : 'This reset link is invalid or has expired.'});
+            }
+            const hash = await bcrypt.hash(password, SALT_ROUNDS);
+            await Users.update({password : hash, resetToken : null, resetExpires : null}, {where : {id : user.id}});
+            return res.json({status : true, message : 'Password updated. You can now log in.'});
+      }catch(err){
+            console.log('reset-password error:', err.message);
+            return res.json({status : false, message : 'Something went wrong, please try again.'});
+      }
 });
 
 router.get('/logout', (req, res)=>{

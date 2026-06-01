@@ -976,6 +976,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /********************************************************
+    Empty board hint (shown only when a board has no notes)
+********************************************************/
+.content_inner .container-fluid .row:empty::before {
+    content: "No notes yet — tap the + button (or press N) to add one.";
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: #9aa7b8;
+    font-size: 16px;
+    padding-top: 90px;
+    pointer-events: none;
+}
+
+/********************************************************
     Floating "Add note" button (+)
 ********************************************************/
 .add_note_fab {

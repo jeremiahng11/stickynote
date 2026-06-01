@@ -13,6 +13,14 @@ var userSchema = con.define('sn_users',{
       status : {
             type : sequelize.STRING,
             defaultValue : 1
+      },
+      resetToken : {
+            type : sequelize.STRING,
+            allowNull : true
+      },
+      resetExpires : {
+            type : sequelize.BIGINT,
+            allowNull : true
       }
 });
 

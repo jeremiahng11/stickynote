@@ -3,9 +3,6 @@
 [Master Javascript]
 -------------------------------------------------------------------*/
 
-// Build marker — check the browser console to confirm the latest JS is loaded.
-console.log('[stickynotes] custom.js build 2026-05-31-q (remember active board)');
-
 // Default square sticky size (like a real post-it pad), in px.
 var NOTE_SIZE = 200;
 
@@ -118,9 +115,9 @@ function runAutoSave(tid) {
 							var title = $('#title').val();
 							$.post(url,{title : title}, function(response){ 
 								if(response.status == true){
-									var addboard=	'<div class="sidebar_drawer_box" title_id='+response.data.id+'>'+
-												'<span class="note_date">'+response.data.createdAt+'</span>'+
-												'<span><p class="title">'+response.data.title+'</p><span>'+
+									var addboard=	'<div class="sidebar_drawer_box" title_id="'+attrEscape(String(response.data.id))+'">'+
+												'<span class="note_date">'+attrEscape(String(response.data.createdAt))+'</span>'+
+												'<span><p class="title">'+attrEscape(String(response.data.title))+'</p><span>'+
 												'<span class="note_count"><b>0</b> Notes</span>'+
 												'<a class="sidebar_drawer_box_delete" href="javascript:void(0);"><i class="far fa-trash-alt"></i></a>'+
 												'</div>'
@@ -236,13 +233,29 @@ function runAutoSave(tid) {
 					// "Add New" button: drop a note at a staggered position so many
 					// notes don't stack exactly on top of each other.
 					// (addNoteAt guards against rapid double-clicks creating two notes.)
+					function addStaggeredNote(){
+						var count = $('.content_inner .note_box').length;
+						var offset = (count % 8) * 28;
+						addNoteAt(40 + offset, 40 + offset);
+					}
+
 					$(document).on("click",".add_note_box", function(){
 						if(boardIsActive()){
-							var count = $('.content_inner .note_box').length;
-							var offset = (count % 8) * 28;
-							addNoteAt(40 + offset, 40 + offset);
+							addStaggeredNote();
 						}else{
 							isValid('error', 'Select or create a board first.');
+						}
+					});
+
+					// keyboard shortcut: press "n" to add a note (ignored while typing)
+					$(document).on('keydown', function(e){
+						if(e.key !== 'n' && e.key !== 'N'){ return; }
+						if(e.ctrlKey || e.metaKey || e.altKey){ return; }
+						var tag = (e.target.tagName || '').toLowerCase();
+						if(tag === 'input' || tag === 'textarea' || e.target.isContentEditable){ return; }
+						if(boardIsActive()){
+							e.preventDefault();
+							addStaggeredNote();
 						}
 					});
 
@@ -638,8 +651,7 @@ function addNoteAt(x, y) {
 	});
 	makeNoteResizable($note);
 	$note.find('textarea').focus();
-	// persist the new note right away so it survives a reload even before editing
-	scheduleAutoSave();
+	// a brand-new blank note is not saved until it has content or is moved/resized
 	return $note;
 }
 
@@ -676,6 +688,8 @@ function autoSave(tid, opts){
 		try{
 			var a = JSON.parse(td);
 			if(!a.id || a.id == 0){
+				// don't persist a brand-new note that has no content yet
+				if(!a.note || String(a.note).trim() === ''){ return; }
 				// every unsaved note must carry a cid so the server-assigned id can
 				// be reconciled back; assign one if it's missing (e.g. leftover notes)
 				if(!a.cid){ a.cid = 'c' + (++clientNoteSeq); }

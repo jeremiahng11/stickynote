@@ -244,48 +244,30 @@ function isValid(typeAlert,message) {
 // var el_down = document.getElementById("geeks"); 
   
 /* Function to generate combination of password */ 
-function generateP() { 
+function generateP() {
     if(forgotEmailValidation()){
-        var pass = ''; 
-        var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +  
-                'abcdefghijklmnopqrstuvwxyz0123456789@#$'; 
-            
-        for (i = 1; i <= 8; i++) { 
-            var char = Math.floor(Math.random() 
-                        * str.length + 1); 
-                
-            pass += str.charAt(char) 
-        } 
-        
         var xhttp= new XMLHttpRequest();
             xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200 ){ 
+                if(this.readyState == 4 && this.status == 200 ){
                     var res=JSON.parse(this.responseText)
-                    console.log(res)
                     if(res.status == true){
-                        let typeAlert='ok';
-                        let message = res.message
-                        isValid(typeAlert,message);
-                        setTimeout(function(){
-                            window.location.href = '/';
-                        },500)
+                        isValid('ok', res.message);
                     }else{
-                        let typeAlert='error';
-                        let message = res.message
-                        isValid(typeAlert,message);                   
+                        isValid('error', res.message);
                     }
                 }
             }
-        
-        var requestData = `email=${forgot_email.value}&&newPassword=${pass}`
-            
+
+        // only the email is sent now; the server emails a one-time reset link
+        var requestData = 'email=' + encodeURIComponent(forgot_email.value)
+
         xhttp.open('post', url+ "forgot-password", true)
         xhttp.setRequestHeader('content-type','application/x-www-form-urlencoded')
         xhttp.send(requestData);
     }else{
         forgotEmailValidation()
     }
-} 
+}
 
 function forgotEmailValidation() {
     forgotEmailError.innerHTML = '';

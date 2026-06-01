@@ -4,6 +4,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const mysql = require('mysql2/promise');
+const rateLimit = require('express-rate-limit');
 const MySQLStore = require('express-mysql-session')(session);
 
 const con = require('./models/connection');
@@ -67,30 +68,37 @@ sessionStore.on('error', (err) => {
     console.error('Session store error:', err.message);
 });
 
+// Warn loudly if the session secret is left at the insecure default in prod.
+const SESSION_SECRET = process.env.SESSION_SECRET || 'stickyNotes123#';
+if (!process.env.SESSION_SECRET) {
+    console.warn('WARNING: SESSION_SECRET is not set — using an insecure default. Set it in production.');
+}
+
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || 'stickyNotes123#',
+        secret: SESSION_SECRET,
         store: sessionStore,
         resave: false,
         saveUninitialized: false,
         cookie: {
             secure: process.env.COOKIE_SECURE === 'true',
             httpOnly: true,
+            sameSite: 'lax',
             maxAge: 1000 * 60 * 60 * 24, // 1 day
         },
     })
 );
 
-// CORS headers
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-Requested-With,content-type,enctype,Authorization'
-    );
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
+// (CORS headers removed — the frontend is served from the same origin, and the
+//  previous `Allow-Origin: *` + `Allow-Credentials: true` combo was insecure.)
+
+// Throttle auth attempts to slow down brute-force / credential stuffing.
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20,                  // 20 attempts per IP per window
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { status: false, message: 'Too many attempts. Please try again later.' },
 });
 
 // health check endpoint for Coolify / load balancers
@@ -98,6 +106,9 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
+// only throttle the POST actions, not the page loads
+const limitPosts = (req, res, next) => (req.method === 'POST' ? authLimiter(req, res, next) : next());
+app.use(['/login-register', '/forgot-password', '/reset-password'], limitPosts);
 app.use('/', userRouter);
 app.use('/stickyBoard', stickyRouter);
 
@@ -124,6 +135,23 @@ async function ensureNoteSizeColumns() {
         }
     } catch (err) {
         console.log('Could not ensure note size columns: ' + err.message);
+    }
+}
+
+// Add the password-reset columns to an existing sn_users table if missing.
+async function ensureUserResetColumns() {
+    const { STRING, BIGINT } = require('sequelize');
+    const qi = con.getQueryInterface();
+    try {
+        const desc = await qi.describeTable('sn_users');
+        if (!desc.resetToken) {
+            await qi.addColumn('sn_users', 'resetToken', { type: STRING, allowNull: true });
+        }
+        if (!desc.resetExpires) {
+            await qi.addColumn('sn_users', 'resetExpires', { type: BIGINT, allowNull: true });
+        }
+    } catch (err) {
+        console.log('Could not ensure user reset columns: ' + err.message);
     }
 }
 
@@ -164,6 +192,7 @@ async function start() {
         await con.connectWithRetry();
         await con.sync();
         await ensureNoteSizeColumns();
+        await ensureUserResetColumns();
         await cleanupBadNotes();
         await dedupeNotes();
         console.log('Database synced');
